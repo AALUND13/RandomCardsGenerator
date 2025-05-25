@@ -43,5 +43,9 @@ namespace RandomCardsGenerators.Cards {
         protected override string GetTitle() {
             return cardInfo.cardName;
         }
+
+        public override string GetModName() {
+            return ModInitials;
+        }
     }
 }
