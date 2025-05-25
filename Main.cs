@@ -17,9 +17,9 @@ namespace RandomCardsGenerators {
         internal const string modInitials = "RCG";
         
         internal static Main instance;
-        internal static AssetBundle assets;
         internal static ManualLogSource ModLogger;
 
+        internal static AssetBundle assets;
         internal static GameObject blankCardPrefab;
 
         internal static Type RarityTextType; 
@@ -30,11 +30,6 @@ namespace RandomCardsGenerators {
             new Harmony(modId).PatchAll();
 
             assets = Jotunn.Utils.AssetUtils.LoadAssetBundleFromResources("randomcardsgenerator_assets", typeof(Main).Assembly);
-            if(assets == null) {
-                Debug.LogError($"Failed to load asset bundle: {modId}");
-                return;
-            }
-
             blankCardPrefab = assets.LoadAsset<GameObject>("__RCG__BlankCard");
 
             Debug.Log($"{modName} loaded!");
