@@ -72,13 +72,15 @@ namespace RandomCardsGenerators.Cards {
         private void GenerateCard(RandomCardsGenerator generator, int seed) {
             var cardInfo = GetComponent<CardInfo>();
 
-            generator.GenerateRandomStats(seed, null, (generatedCardInfo) => {
-                CardInfoStat[] stats = generatedCardInfo.CardInfo.cardStats;
-                System.Random generatedRandom = new System.Random(seed);
+            generator.GenerateRandomCard(seed, null, (generatedCardInfo) => {
+                LoggerUtils.LogInfo($"CardGenerator: {generator}");
+                LoggerUtils.LogInfo($"GeneratedCardInfo: {generatedCardInfo}");
+
+                var stats = generatedCardInfo.CardInfo.cardStats;
+                var generatedRandom = new System.Random(seed);
 
                 generator.ApplyRandomStats(cardInfo, generatedRandom);
                 LoggerUtils.LogInfo($"Applied {stats.Length} stats to CardInfo {cardInfo.cardName}.");
-
 
                 cardInfo.sourceCard = generatedCardInfo.CardInfo;
                 cardInfo.cardStats = stats;
