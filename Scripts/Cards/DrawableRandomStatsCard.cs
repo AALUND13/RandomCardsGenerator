@@ -17,6 +17,8 @@ namespace RandomCardsGenerators.Cards {
 
         public DrawableRandomStatsCard(RandomCardsGenerator statCardGenerator) {
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
+            cardGameObject.name = $"__{statCardGenerator.randomCardInfo.ModInitials}__{statCardGenerator.CardGenName}_DrawableCard";
+
             GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
             GameObject.DontDestroyOnLoad(cardGameObject);
 
