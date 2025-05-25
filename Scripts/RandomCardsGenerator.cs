@@ -75,11 +75,15 @@ namespace RandomCardsGenerators {
             this.randomCardInfo = randomCardInfo;
 
             NetworkingManager.RegisterEvent($"{cardGenName}_SyncEvent", (data) => {
-                var seed = (int)data[0];
-                var playerID = (int)data[1];
+                try {
+                    var seed = (int)data[0];
+                    var playerID = (int)data[1];
 
-                Player player = PlayerManager.instance.players.Find(p => p.playerID == playerID);
-                GenerateRandomStats(seed, player);
+                    Player player = PlayerManager.instance.players.Find(p => p.playerID == playerID);
+                    GenerateRandomCard(seed, player);
+                } catch(Exception e) {
+                    LoggerUtils.LogError($"Error generating random stats for {cardGenName}: {e}");
+                }
             });
         }
 
