@@ -4,13 +4,15 @@ using UnboundLib;
 
 namespace RandomCardsGenerators {
     public class ModRandomCardsGenerators {
-        protected readonly Dictionary<string, RandomCardsGenerator> CardsGenerators;
+        protected readonly Dictionary<string, RandomCardsGenerator> CardsGenerators = new Dictionary<string, RandomCardsGenerator>();
 
         public ModRandomCardsGenerators(List<RandomCardsGenerator> cardsGenerators) {
             foreach(var handler in cardsGenerators) {
-                if(CardsGenerators.ContainsKey(handler.CardGenName)) {
+                if(cardsGenerators == null || cardsGenerators.Count == 0)
+                    throw new Exception("No handlers provided.");
+                else if(CardsGenerators.ContainsKey(handler.CardGenName))
                     throw new Exception($"Handler for {handler.CardGenName} already exists.");
-                }
+
                 CardsGenerators.Add(handler.CardGenName, handler);
             }
         }
@@ -47,10 +49,9 @@ namespace RandomCardsGenerators {
     /// <para>I highly recommend using this version instead of the non-generic one. Because it is more type-safe.</para>
     /// </summary>
     public class ModRandomCardsGenerators<T> : ModRandomCardsGenerators where T : Enum {
-        protected readonly Dictionary<T, RandomCardsGenerator> TypedCardsGenerators;
+        protected readonly Dictionary<T, RandomCardsGenerator> TypedCardsGenerators = new Dictionary<T, RandomCardsGenerator>();
 
         public ModRandomCardsGenerators(Dictionary<T, RandomCardsGenerator> cardsGenerators) : base(new List<RandomCardsGenerator>(cardsGenerators.Values)) {
-            TypedCardsGenerators = cardsGenerators;
             foreach(var handler in cardsGenerators) {
                 if(CardsGenerators.ContainsKey(handler.Value.CardGenName)) {
                     throw new Exception($"Handler for {handler.Key} already exists.");
