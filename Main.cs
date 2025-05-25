@@ -7,6 +7,7 @@ namespace RandomCardsGenerators {
     [BepInDependency("pykess.rounds.plugins.cardchoicespawnuniquecardpatch", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("root.rarity.lib", BepInDependency.DependencyFlags.HardDependency)]
     [BepInPlugin(modId, modName, "1.0.0")]
     [BepInProcess("Rounds.exe")]
     public class Main : BaseUnityPlugin {

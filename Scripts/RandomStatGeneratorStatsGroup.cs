@@ -1,5 +1,4 @@
-﻿using RandomCardsGenerators;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RandomCardsGenerators.StatsGroup {
     public class DamageStatGenerator : RandomStatGenerator {

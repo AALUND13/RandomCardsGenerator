@@ -23,6 +23,7 @@ MonoBehaviour:
   - willis81808-UnboundLib-3.2.14
   - Pykess-ModdingUtils-0.4.8
   - Pykess-CardChoiceSpawnUniqueCardPatch-0.1.10
+  - Root-RarityLib-1.2.8
   DllDependencies: []
   AssemblyDefinitionDependencies: []
   IncludeInAllExports: 1
