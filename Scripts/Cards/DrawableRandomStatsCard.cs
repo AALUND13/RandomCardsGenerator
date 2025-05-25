@@ -76,6 +76,7 @@ namespace RandomCardsGenerators.Cards {
                 LoggerUtils.LogInfo($"CardGenerator: {generator}");
                 LoggerUtils.LogInfo($"GeneratedCardInfo: {generatedCardInfo}");
 
+                var newGeneratedCardInfo = new GeneratedCardInfo(generator, cardInfo, generatedCardInfo.RandomStatInfos, generatedCardInfo.Random, seed);
                 var stats = generatedCardInfo.CardInfo.cardStats;
                 var generatedRandom = new System.Random(seed);
 
@@ -84,7 +85,7 @@ namespace RandomCardsGenerators.Cards {
 
                 cardInfo.sourceCard = generatedCardInfo.CardInfo;
                 cardInfo.cardStats = stats;
-                generatedCardInfo.RandomCardsGenerator.OnCardGenerated?.Invoke(generatedCardInfo);
+                generatedCardInfo.RandomCardsGenerator.OnCardGenerated?.Invoke(newGeneratedCardInfo);
 
 
                 CardInfoDisplayer displayer = gameObject.GetComponentInChildren<CardInfoDisplayer>();
