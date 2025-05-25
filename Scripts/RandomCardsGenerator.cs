@@ -64,16 +64,16 @@ namespace RandomCardsGenerators {
 
         public Action<GeneratedCardInfo> OnCardGenerated;
 
-        public RandomCardsGenerator(string statGenName, RandomCardOption randomCardInfo, List<RandomStatGenerator> statGenerators) {
-            if(RandomStatCardGenerators.ContainsKey(statGenName))
-                throw new Exception($"A RandomCardsGenerators with the name {statGenName} already exists!");
-            RandomStatCardGenerators.Add(statGenName, this);
+        public RandomCardsGenerator(string cardGenName, RandomCardOption randomCardInfo, List<RandomStatGenerator> statGenerators) {
+            if(RandomStatCardGenerators.ContainsKey(cardGenName))
+                throw new Exception($"A RandomCardsGenerators with the name {cardGenName} already exists!");
+            RandomStatCardGenerators.Add(cardGenName, this);
 
-            CardGenName = statGenName;
+            this.CardGenName = cardGenName;
             StatGenerators = statGenerators;
             this.randomCardInfo = randomCardInfo;
 
-            NetworkingManager.RegisterEvent($"{statGenName}_SyncEvent", (data) => {
+            NetworkingManager.RegisterEvent($"{cardGenName}_SyncEvent", (data) => {
                 var seed = (int)data[0];
                 var playerID = (int)data[1];
 
