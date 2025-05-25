@@ -1,0 +1,42 @@
+using BepInEx;
+using BepInEx.Logging;
+using HarmonyLib;
+using UnityEngine;
+
+namespace RandomCardsGenerators {
+    [BepInDependency("pykess.rounds.plugins.cardchoicespawnuniquecardpatch", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInPlugin(modId, modName, "1.0.0")]
+    [BepInProcess("Rounds.exe")]
+    public class Main : BaseUnityPlugin {
+        private const string modId = "com.aalund13.rounds.random_cards_generator";
+        private const string modName = "Random Cards Generator";
+        internal const string modInitials = "RCG";
+        
+        internal static Main instance;
+        internal static AssetBundle assets;
+        internal static ManualLogSource ModLogger;
+
+        internal static GameObject blankCardPrefab;
+
+        void Awake() {
+            instance = this;
+            ModLogger = Logger;
+            new Harmony(modId).PatchAll();
+
+            assets = Jotunn.Utils.AssetUtils.LoadAssetBundleFromResources("randomcardsgenerator_assets", typeof(Main).Assembly);
+            if(assets == null) {
+                Debug.LogError($"Failed to load asset bundle: {modId}");
+                return;
+            }
+
+            blankCardPrefab = assets.LoadAsset<GameObject>("__RCG__BlankCard");
+
+            Debug.Log($"{modName} loaded!");
+        }
+        void Start() {
+            Debug.Log($"{modName} started!");
+        }
+    }
+}
