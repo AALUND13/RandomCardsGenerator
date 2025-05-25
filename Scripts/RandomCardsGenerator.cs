@@ -54,6 +54,10 @@ namespace RandomCardsGenerators {
             Random = random;
             Seed = seed;
         }
+
+        public override string ToString() {
+            return $"GeneratedCardInfo: {RandomCardsGenerator.CardGenName} | CardName: {CardInfo.cardName} | Seed: {Seed} | RandomStatInfos: {string.Join(", ", RandomStatInfos.Select(x => x.StatGenerator.StatName))}";
+        }
     }
 
     public class RandomCardsGenerator {
@@ -129,6 +133,8 @@ namespace RandomCardsGenerators {
                     amount = item.StatGenerator.GetStatString(item.Value),
                     positive = item.StatGenerator.IsPositive(item.Value)
                 });
+
+                LoggerUtils.LogInfo($"Applied stat {item.StatGenerator.StatName} with value {item.Value}.");
             }
             cardInfo.cardStats = cardStats.ToArray();
 
@@ -172,6 +178,8 @@ namespace RandomCardsGenerators {
         }
 
         private RandomStatInfo[] SelectRandomStats(System.Random random, int min, int max) {
+            LoggerUtils.LogInfo($"Selecting random stats for {CardGenName}...");
+
             int count = random.Next(min, max);
 
             var selectedGenerator = new List<RandomStatGenerator>(count);
@@ -186,10 +194,17 @@ namespace RandomCardsGenerators {
 
                     selectedGenerator.Add(StatGenerators[index]);
                     selected[selectedGenerator.Count - 1] = new RandomStatInfo(StatGenerators[index], value);
+                    LoggerUtils.LogInfo($"Selected stat {selected[selectedGenerator.Count - 1].StatGenerator.StatName} with value {selected[selectedGenerator.Count - 1].Value}.");
                 }
             }
 
+            LoggerUtils.LogInfo($"Selected {selectedGenerator.Count} stats for {CardGenName}.");
+
             return selected;
+        }
+
+        public override string ToString() {
+            return $"RandomCardsGenerator: {CardGenName} | CardName: {randomCardInfo.CardName} | Rarity: {randomCardInfo.CardRarity} | Min: {randomCardInfo.Min} | Max: {randomCardInfo.Max}";
         }
     }
 }
