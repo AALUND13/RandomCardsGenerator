@@ -19,12 +19,12 @@ namespace RandomCardsGenerators {
 
         public void CreateRandomCard(string cardGenName, int seed, Player player = null) {
             var handler = GetHandler(cardGenName);
-            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player.playerID);
+            NetworkingManager.RaiseEvent(string.Format(RandomCardsGenerator.SYNC_EVENT_FORMAT, handler.CardGenName), seed, player.playerID);
         }
         public void CreateRandomCard(string cardGenName, Player player = null) {
             var handler = GetHandler(cardGenName);
             int seed = UnityEngine.Random.Range(0, int.MaxValue);
-            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player.playerID);
+            NetworkingManager.RaiseEvent(string.Format(RandomCardsGenerator.SYNC_EVENT_FORMAT, handler.CardGenName), seed, player.playerID);
         }
 
         public RandomCardsGenerator GetHandler(string statGenName) => CardsGenerators[statGenName];
@@ -62,12 +62,12 @@ namespace RandomCardsGenerators {
 
         public void CreateRandomCard(T stats, int seed, Player player = null) {
             var handler = GetHandler(stats);
-            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player?.playerID ?? -1);
+            NetworkingManager.RaiseEvent(string.Format(RandomCardsGenerator.SYNC_EVENT_FORMAT, handler.CardGenName), seed, player?.playerID ?? -1);
         }
         public void CreateRandomCard(T stats, Player player = null) {
             var handler = GetHandler(stats);
             int seed = UnityEngine.Random.Range(0, int.MaxValue);
-            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player?.playerID ?? -1);
+            NetworkingManager.RaiseEvent(string.Format(RandomCardsGenerator.SYNC_EVENT_FORMAT, handler.CardGenName), seed, player?.playerID ?? -1);
         }
 
         public RandomCardsGenerator GetHandler(T stat) => TypedCardsGenerators[stat];

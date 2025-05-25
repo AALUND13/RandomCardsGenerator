@@ -61,6 +61,9 @@ namespace RandomCardsGenerators {
     }
 
     public class RandomCardsGenerator {
+        internal const string SYNC_EVENT_FORMAT = "{0}_SyncEvent";
+        internal const string CARD_NAME_FORMAT = "{0} Card ({1})";
+
         internal static readonly Dictionary<string, RandomCardsGenerator> RandomStatCardGenerators = new Dictionary<string, RandomCardsGenerator>();
 
         public readonly List<RandomStatGenerator> StatGenerators;
@@ -78,7 +81,7 @@ namespace RandomCardsGenerators {
             StatGenerators = statGenerators;
             this.randomCardInfo = randomCardInfo;
 
-            NetworkingManager.RegisterEvent($"{cardGenName}_SyncEvent", (data) => {
+            NetworkingManager.RegisterEvent(string.Format(SYNC_EVENT_FORMAT, cardGenName), (data) => {
                 try {
                     var seed = (int)data[0];
                     var playerID = (int)data[1];
@@ -155,7 +158,7 @@ namespace RandomCardsGenerators {
 
             GeneratedCardHolder.AddCardToGenerated(CardGenName, statCard);
 
-            statCard.cardName = $"{CardGenName} Card ({GeneratedCardHolder.GetGeneratedCards(CardGenName).Count})";
+            statCard.cardName = string.Format(CARD_NAME_FORMAT, randomCardInfo.CardName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
             statCard.cardDestription = randomCardInfo.CardDescription;
             statCard.rarity = randomCardInfo.CardRarity;
             ModdingUtils.Utils.Cards.instance.AddHiddenCard(statCard);
