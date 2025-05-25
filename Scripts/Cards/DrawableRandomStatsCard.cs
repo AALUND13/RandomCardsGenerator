@@ -24,6 +24,8 @@ namespace RandomCardsGenerators.Cards {
 
             var card = cardGameObject.AddComponent<RandomStatsCard>();
             CardInfo = cardGameObject.GetComponent<CardInfo>();
+            CardInfo.cardBase = Main.blankCardPrefab.GetComponent<CardInfo>().cardBase;
+            CardInfo.rarity = statCardGenerator.randomCardInfo.CardRarity;
 
             card.StatGenName = statCardGenerator.CardGenName;
 
