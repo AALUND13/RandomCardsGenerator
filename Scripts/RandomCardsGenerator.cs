@@ -104,7 +104,7 @@ namespace RandomCardsGenerators {
             int minClamped = Mathf.Max(0, randomCardInfo.Min);
             int maxClamped = Mathf.Clamp(randomCardInfo.Max, minClamped, StatGenerators.Count);
 
-            var statCard = cardInfo.gameObject.AddComponent<BuildRandomStatCard>();
+            var statCard = cardInfo.gameObject.GetOrAddComponent<BuildRandomStatCard>();
             statCard.CardName = randomCardInfo.CardName;
             statCard.ModInitials = randomCardInfo.ModInitials;
 
@@ -133,7 +133,7 @@ namespace RandomCardsGenerators {
             return selectedStats;
         }
 
-        public void GenerateRandomStats(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
+        public void GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
             System.Random random = new System.Random(seed);
 
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
