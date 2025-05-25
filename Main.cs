@@ -1,6 +1,7 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System;
 using UnityEngine;
 
 namespace RandomCardsGenerators {
@@ -21,6 +22,8 @@ namespace RandomCardsGenerators {
 
         internal static GameObject blankCardPrefab;
 
+        internal static Type RarityTextType; 
+
         void Awake() {
             instance = this;
             ModLogger = Logger;
@@ -37,6 +40,11 @@ namespace RandomCardsGenerators {
             Debug.Log($"{modName} loaded!");
         }
         void Start() {
+            if(BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("pykess.rounds.plugins.deckcustomization", out var plugin)) {
+                var assembly = plugin.Instance.GetType().Assembly;
+                RarityTextType = assembly.GetType("DeckCustomization.RarityText");
+            }
+
             Debug.Log($"{modName} started!");
         }
     }

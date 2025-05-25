@@ -93,6 +93,11 @@ namespace RandomCardsGenerators.Cards {
                 CardInfoDisplayer displayer = gameObject.GetComponentInChildren<CardInfoDisplayer>();
                 displayer.DrawCard(stats, generator.randomCardInfo.CardName, generator.randomCardInfo.CardDescription);
                 LoggerUtils.LogInfo($"Card {cardInfo.cardName} displayed with {stats.Length} stats.");
+
+                // This type only exist when the 'DeckCustomization' mod is installed, So we check if it exists before adding it.
+                if(Main.RarityTextType != null) {
+                    gameObject.AddComponent(Main.RarityTextType);
+                }
             });
         }
     }
