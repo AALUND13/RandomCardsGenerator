@@ -4,6 +4,7 @@ using RandomCardsGenerators.Utils;
 using RarityLib.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnboundLib;
 using UnityEngine;
 
@@ -172,13 +173,15 @@ namespace RandomCardsGenerators {
             var selectedGenerator = new List<RandomStatGenerator>(count);
             var selected = new RandomStatInfo[count];
 
-            for(int i = 0; i < count; i++) {
+            while(selectedGenerator.Count < count) {
                 int index = random.Next(StatGenerators.Count);
+
                 if(!selectedGenerator.Contains(StatGenerators[index])) {
-                    selectedGenerator.Add(StatGenerators[index]);
                     float value = random.NextFloat(StatGenerators[index].MinValue, StatGenerators[index].MaxValue);
                     if(!StatGenerators[index].ShouldApply(value)) continue;
-                    selected[i] = new RandomStatInfo(StatGenerators[index], value);
+
+                    selectedGenerator.Add(StatGenerators[index]);
+                    selected[selectedGenerator.Count - 1] = new RandomStatInfo(StatGenerators[index], value);
                 }
             }
 
