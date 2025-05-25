@@ -62,12 +62,12 @@ namespace RandomCardsGenerators {
 
         public void CreateRandomCard(T stats, int seed, Player player = null) {
             var handler = GetHandler(stats);
-            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player.playerID);
+            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player?.playerID ?? -1);
         }
         public void CreateRandomCard(T stats, Player player = null) {
             var handler = GetHandler(stats);
             int seed = UnityEngine.Random.Range(0, int.MaxValue);
-            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player.playerID);
+            NetworkingManager.RaiseEvent($"{handler.CardGenName}_SyncEvent", seed, player?.playerID ?? -1);
         }
 
         public RandomCardsGenerator GetHandler(T stat) => TypedCardsGenerators[stat];
