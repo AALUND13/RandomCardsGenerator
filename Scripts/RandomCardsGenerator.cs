@@ -56,6 +56,8 @@ namespace RandomCardsGenerators {
         public RandomStatInfo[] RandomStatInfos;
         public int Seed;
 
+        public bool HasValue => CardInfo != null && RandomStatInfos != null && RandomStatInfos.Length > 0;
+
         public GeneratedCardInfo(RandomCardsGenerator randomCardsGenerator, CardInfo cardInfo, RandomStatInfo[] randomStatInfos, System.Random random, int seed) {
             RandomCardsGenerator = randomCardsGenerator;
             CardInfo = cardInfo;
@@ -84,6 +86,9 @@ namespace RandomCardsGenerators {
         public RandomCardsGenerator(string cardGenName, RandomCardOption randomCardInfo, List<RandomStatGenerator> statGenerators) {
             if(RandomStatCardGenerators.ContainsKey(cardGenName))
                 throw new Exception($"A RandomCardsGenerators with the name {cardGenName} already exists!");
+            else if(string.IsNullOrEmpty(cardGenName) || string.IsNullOrWhiteSpace(cardGenName))
+                throw new Exception("Card generator name cannot be null or empty!");
+
             RandomStatCardGenerators.Add(cardGenName, this);
 
             this.CardGenName = cardGenName;
