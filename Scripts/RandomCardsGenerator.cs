@@ -17,6 +17,10 @@ namespace RandomCardsGenerators {
             StatGenerator = statGenerator;
             Value = value;
         }
+
+        public override string ToString() {
+            return $"RandomStatInfo: {StatGenerator.StatName} | Value: {Value}";
+        }
     }
     public struct RandomCardOption {
         public string CardName;
@@ -39,7 +43,12 @@ namespace RandomCardsGenerators {
 
         public RandomCardOption(string cardName, string cardRarity, string modInitials, string cardDescription, string twoLetterCode, int min, int max) :
             this(cardName, RarityUtils.GetRarity(cardRarity), modInitials, cardDescription, twoLetterCode, min, max) { }
+
+        public override string ToString() {
+            return $"RandomCardOption: {CardName} | Rarity: {CardRarity} | ModInitials: {ModInitials} | Description: {CardDescription} | TwoLetterCode: {TwoLetterCode} | Min: {Min} | Max: {Max}";
+        }
     }
+
     public struct GeneratedCardInfo {
         public RandomCardsGenerator RandomCardsGenerator;
         public CardInfo CardInfo;
