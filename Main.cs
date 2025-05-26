@@ -2,6 +2,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RandomCardsGenerators {
@@ -16,6 +17,7 @@ namespace RandomCardsGenerators {
         private const string modName = "Random Cards Generator";
         internal const string modInitials = "RCG";
 
+
         internal static Main instance;
         internal static ManualLogSource ModLogger;
 
@@ -23,11 +25,16 @@ namespace RandomCardsGenerators {
         internal static GameObject blankCardPrefab;
 
         internal static Type RarityTextType;
+        internal static Dictionary<string, float> ModRarities;
+
+        private static Harmony harmony;
 
         void Awake() {
             instance = this;
             ModLogger = Logger;
-            new Harmony(modId).PatchAll();
+
+            harmony = new Harmony(modId);
+            harmony.PatchAll();
 
             assets = Jotunn.Utils.AssetUtils.LoadAssetBundleFromResources("randomcardsgenerator_assets", typeof(Main).Assembly);
             blankCardPrefab = assets.LoadAsset<GameObject>("__RCG__BlankCard");
@@ -38,6 +45,8 @@ namespace RandomCardsGenerators {
             if(BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("pykess.rounds.plugins.deckcustomization", out var plugin)) {
                 var assembly = plugin.Instance.GetType().Assembly;
                 RarityTextType = assembly.GetType("DeckCustomization.RarityText");
+                ModRarities = (Dictionary<string, float>)assembly.GetType("DeckCustomization.DeckCustomization").GetField("ModRarities", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).GetValue(null);
+                DeckCustomizationPatch.Patch(harmony, assembly);
             }
 
             Debug.Log($"{modName} started!");

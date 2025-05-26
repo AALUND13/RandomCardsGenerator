@@ -151,7 +151,7 @@ namespace RandomCardsGenerators {
             var statCard = cardGameObject.GetComponent<CardInfo>();
             var buildRandomStatCard = cardGameObject.AddComponent<BuildRandomStatCard>();
 
-            statCard.cardName = string.Format(CARD_NAME_FORMAT, randomCardInfo.CardName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
+            statCard.cardName = string.Format(CARD_NAME_FORMAT, CardGenName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
             statCard.cardDestription = randomCardInfo.CardDescription;
             statCard.rarity = randomCardInfo.CardRarity;
             ModdingUtils.Utils.Cards.instance.AddHiddenCard(statCard);
@@ -159,10 +159,10 @@ namespace RandomCardsGenerators {
             var random = new System.Random(seed);
             var selectedStats = ApplyRandomStats(statCard, random);
 
-            buildRandomStatCard.BuildUnityCard((cardInfo) => {
-                GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, cardInfo, selectedStats, random, seed);
-                GeneratedCardHolder.AddCardToGenerated(CardGenName, GeneratedCardData);
+            GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, statCard, selectedStats, random, seed);
+            GeneratedCardHolder.AddCardToGenerated(CardGenName, GeneratedCardData);
 
+            buildRandomStatCard.BuildUnityCard((cardInfo) => {
                 onCardGenerated?.Invoke(GeneratedCardData);
                 OnCardGenerated?.Invoke(GeneratedCardData);
 
