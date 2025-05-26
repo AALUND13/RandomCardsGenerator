@@ -6,7 +6,9 @@ using UnityEngine;
 namespace RandomCardsGenerators.Cards {
     /// <summary>
     /// By default, just by creating a new instance of this class will <strong>NOT</strong> make the random card appear in hands.
-    /// <para>You have to implement that functionality yourself. Take a look at [Corrupted Cards Manager Link Here] for an example.</para>
+    /// <para>You have to implement that functionality yourself. Take a look at <see href="https://github.com/AALUND13/CorruptedCardsManager">CorruptedCardsManager</see> for an example.</para>
+    /// <para>To be specific, Take a look at <see href="https://github.com/AALUND13/CorruptedCardsManager/blob/main/Scripts/Patches/SpawnUniqueCard.cs">SpawnUniqueCardPatch</see>
+    /// and <see href="https://github.com/AALUND13/CorruptedCardsManager/blob/main/Scripts/CorruptedCardsGenerators.cs#L26">CorruptedCardsGenerators</see> classes.</para>
     /// </summary>
     public class DrawableRandomStatsCard {
         private static readonly System.Random random = new System.Random();
