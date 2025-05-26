@@ -15,14 +15,14 @@ namespace RandomCardsGenerators {
         private const string modId = "com.aalund13.rounds.random_cards_generator";
         private const string modName = "Random Cards Generator";
         internal const string modInitials = "RCG";
-        
+
         internal static Main instance;
         internal static ManualLogSource ModLogger;
 
         internal static AssetBundle assets;
         internal static GameObject blankCardPrefab;
 
-        internal static Type RarityTextType; 
+        internal static Type RarityTextType;
 
         void Awake() {
             instance = this;

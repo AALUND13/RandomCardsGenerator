@@ -53,9 +53,9 @@ namespace RandomCardsGenerators {
 
         public ModRandomCardsGenerators(Dictionary<T, RandomCardsGenerator> cardsGenerators) : base(new List<RandomCardsGenerator>(cardsGenerators.Values)) {
             foreach(var handler in cardsGenerators) {
-                if(TypedCardsGenerators.ContainsKey(handler.Key)) 
+                if(TypedCardsGenerators.ContainsKey(handler.Key))
                     throw new Exception($"Handler for {handler.Key} already exists.");
-                
+
                 TypedCardsGenerators.Add(handler.Key, handler.Value);
             }
         }

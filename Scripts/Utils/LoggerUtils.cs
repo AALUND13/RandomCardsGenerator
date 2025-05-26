@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RandomCardsGenerators.Utils {
+﻿namespace RandomCardsGenerators.Utils {
     internal static class LoggerUtils {
 #if DEBUG
         private const bool logging = true;

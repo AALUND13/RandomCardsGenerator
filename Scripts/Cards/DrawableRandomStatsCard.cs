@@ -91,7 +91,6 @@ namespace RandomCardsGenerators.Cards {
                 cardInfo.cardStats = stats;
                 generatedCardInfo.RandomCardsGenerator.OnCardGenerated?.Invoke(newGeneratedCardInfo);
 
-
                 CardInfoDisplayer displayer = gameObject.GetComponentInChildren<CardInfoDisplayer>();
                 displayer.DrawCard(stats, generator.randomCardInfo.CardName, generator.randomCardInfo.CardDescription);
                 LoggerUtils.LogInfo($"Card {cardInfo.cardName} displayed with {stats.Length} stats.");

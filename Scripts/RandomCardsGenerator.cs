@@ -48,15 +48,16 @@ namespace RandomCardsGenerators {
             return $"RandomCardOption: {CardName} | Rarity: {CardRarity} | ModInitials: {ModInitials} | Description: {CardDescription} | TwoLetterCode: {TwoLetterCode} | Min: {Min} | Max: {Max}";
         }
     }
-
     public struct GeneratedCardInfo {
         public RandomCardsGenerator RandomCardsGenerator;
         public CardInfo CardInfo;
-        public System.Random Random;
         public RandomStatInfo[] RandomStatInfos;
+
+        public System.Random Random;
         public int Seed;
 
-        public bool HasValue => CardInfo != null && RandomStatInfos != null && RandomStatInfos.Length > 0;
+        public bool HasValue =>
+            RandomCardsGenerator != null && CardInfo != null && RandomStatInfos != null && RandomStatInfos.Length > 0;
 
         public GeneratedCardInfo(RandomCardsGenerator randomCardsGenerator, CardInfo cardInfo, RandomStatInfo[] randomStatInfos, System.Random random, int seed) {
             RandomCardsGenerator = randomCardsGenerator;
@@ -91,9 +92,9 @@ namespace RandomCardsGenerators {
 
             RandomStatCardGenerators.Add(cardGenName, this);
 
+            this.randomCardInfo = randomCardInfo;
             this.CardGenName = cardGenName;
             StatGenerators = statGenerators;
-            this.randomCardInfo = randomCardInfo;
 
             NetworkingManager.RegisterEvent(string.Format(SYNC_EVENT_FORMAT, cardGenName), (data) => {
                 try {
@@ -108,27 +109,7 @@ namespace RandomCardsGenerators {
             });
         }
 
-        public CardInfoStat[] GetCardStatsFromSeed(int seed, int min, int max) {
-            System.Random random = new System.Random(seed);
-
-            var selectedStats = SelectRandomStats(random, min, max);
-
-            List<CardInfoStat> cardStats = new List<CardInfoStat>();
-            foreach(var item in selectedStats) {
-                cardStats.Add(new CardInfoStat {
-                    stat = item.StatGenerator.StatName,
-                    amount = item.StatGenerator.GetStatString(item.Value),
-                    positive = item.StatGenerator.IsPositive(item.Value)
-                });
-            }
-
-            return cardStats.ToArray();
-        }
-
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {
-            int minClamped = Mathf.Max(0, randomCardInfo.Min);
-            int maxClamped = Mathf.Clamp(randomCardInfo.Max, minClamped, StatGenerators.Count);
-
             var statCard = cardInfo.gameObject.GetOrAddComponent<BuildRandomStatCard>();
             statCard.CardName = randomCardInfo.CardName;
             statCard.ModInitials = randomCardInfo.ModInitials;
@@ -140,29 +121,29 @@ namespace RandomCardsGenerators {
 
             LoggerUtils.LogInfo($"Generating random stats for {cardInfo.cardName}...");
 
-            var selectedStats = SelectRandomStats(random, minClamped, maxClamped);
-            var cardStats = new List<CardInfoStat>();
+            int minClamped = Mathf.Max(0, randomCardInfo.Min);
+            int maxClamped = Mathf.Clamp(randomCardInfo.Max, minClamped, StatGenerators.Count);
 
-            foreach(var item in selectedStats) {
+            var selectedStats = SelectRandomStats(random, minClamped, maxClamped);
+            cardInfo.cardStats = new CardInfoStat[selectedStats.Length];
+
+            for(int i = 0; i < selectedStats.Length; i++) {
+                var item = selectedStats[i];
                 item.StatGenerator.Apply(item.Value, cardInfo, gun, applyCardStats, statModifiers, block);
-                cardStats.Add(new CardInfoStat {
+
+                cardInfo.cardStats[i] = new CardInfoStat {
                     stat = item.StatGenerator.StatName,
                     amount = item.StatGenerator.GetStatString(item.Value),
                     positive = item.StatGenerator.IsPositive(item.Value)
-                });
-
+                };
                 LoggerUtils.LogInfo($"Applied stat {item.StatGenerator.StatName} with value {item.Value}.");
             }
-            cardInfo.cardStats = cardStats.ToArray();
-
-            LoggerUtils.LogInfo($"Generated {cardStats.Count} stats for {cardInfo.cardName}.");
+            LoggerUtils.LogInfo($"Generated {selectedStats.Length} stats for {cardInfo.cardName}.");
 
             return selectedStats;
         }
 
         public void GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
-            System.Random random = new System.Random(seed);
-
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
             GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
             GameObject.DontDestroyOnLoad(cardGameObject);
@@ -170,12 +151,12 @@ namespace RandomCardsGenerators {
             var statCard = cardGameObject.GetComponent<CardInfo>();
             var buildRandomStatCard = cardGameObject.AddComponent<BuildRandomStatCard>();
 
-
             statCard.cardName = string.Format(CARD_NAME_FORMAT, randomCardInfo.CardName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
             statCard.cardDestription = randomCardInfo.CardDescription;
             statCard.rarity = randomCardInfo.CardRarity;
             ModdingUtils.Utils.Cards.instance.AddHiddenCard(statCard);
 
+            var random = new System.Random(seed);
             var selectedStats = ApplyRandomStats(statCard, random);
 
             buildRandomStatCard.BuildUnityCard((cardInfo) => {
@@ -198,12 +179,14 @@ namespace RandomCardsGenerators {
         private RandomStatInfo[] SelectRandomStats(System.Random random, int min, int max) {
             LoggerUtils.LogInfo($"Selecting random stats for {CardGenName}...");
 
-            int count = random.Next(min, max);
+            int clampedMin = Mathf.Clamp(min, 0, StatGenerators.Count);
+            int clampedMax = Mathf.Clamp(max, clampedMin, StatGenerators.Count);
+            int statsAmount = random.Next(clampedMin, clampedMax + 1);
 
-            var selectedGenerator = new List<RandomStatGenerator>(count);
-            var selected = new RandomStatInfo[count];
+            var selectedGenerator = new List<RandomStatGenerator>(statsAmount);
+            var selected = new RandomStatInfo[statsAmount];
 
-            while(selectedGenerator.Count < count) {
+            while(selectedGenerator.Count < statsAmount) {
                 int index = random.Next(StatGenerators.Count);
 
                 if(!selectedGenerator.Contains(StatGenerators[index])) {
@@ -212,10 +195,10 @@ namespace RandomCardsGenerators {
 
                     selectedGenerator.Add(StatGenerators[index]);
                     selected[selectedGenerator.Count - 1] = new RandomStatInfo(StatGenerators[index], value);
+
                     LoggerUtils.LogInfo($"Selected stat {selected[selectedGenerator.Count - 1].StatGenerator.StatName} with value {selected[selectedGenerator.Count - 1].Value}.");
                 }
             }
-
             LoggerUtils.LogInfo($"Selected {selectedGenerator.Count} stats for {CardGenName}.");
 
             return selected;

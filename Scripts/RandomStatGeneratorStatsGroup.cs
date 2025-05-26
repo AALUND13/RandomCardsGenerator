@@ -16,7 +16,6 @@ namespace RandomCardsGenerators.StatsGroup {
         public override bool IsPositive(float value) => value > 0;
 
     }
-
     public class ReloadTimeStatGenerator : RandomStatGenerator {
         public override string StatName => "Reload Time";
         public float ThresholdToZero;
@@ -31,7 +30,6 @@ namespace RandomCardsGenerators.StatsGroup {
 
         public override bool IsPositive(float value) => value < 0;
     }
-
     public class AttackSpeedStatGenerator : RandomStatGenerator {
         public override string StatName => "Attack Speed";
         public float ThresholdToZero;
@@ -46,7 +44,6 @@ namespace RandomCardsGenerators.StatsGroup {
 
         public override bool IsPositive(float value) => value < 0;
     }
-
     public class MovementSpeedStatGenerator : RandomStatGenerator {
         public override string StatName => "Movement Speed";
         public float ThresholdToZero;
@@ -61,7 +58,6 @@ namespace RandomCardsGenerators.StatsGroup {
 
         public override bool IsPositive(float value) => value > 0;
     }
-
     public class HealthStatGenerator : RandomStatGenerator {
         public override string StatName => "Health";
         public float ThresholdToZero;
@@ -76,7 +72,6 @@ namespace RandomCardsGenerators.StatsGroup {
 
         public override bool IsPositive(float value) => value > 0;
     }
-
     public class BlockCooldownStatGenerator : RandomStatGenerator {
         public override string StatName => "Block Cooldown";
         public float ThresholdToZero;
@@ -90,7 +85,6 @@ namespace RandomCardsGenerators.StatsGroup {
 
         public override bool IsPositive(float value) => value < 0;
     }
-
     public class BulletSpeedStatGenerator : RandomStatGenerator {
         public override string StatName => "Bullet Speed";
         public float ThresholdToZero;
@@ -105,7 +99,6 @@ namespace RandomCardsGenerators.StatsGroup {
 
         public override bool IsPositive(float value) => value > 0;
     }
-
     public class RegenStatGenerator : RandomStatGenerator {
         public override string StatName => "Regen";
         public float ThresholdToZero;
@@ -121,7 +114,6 @@ namespace RandomCardsGenerators.StatsGroup {
         public override string GetStatString(float value) => GetStringValue(value, false);
         public override bool IsPositive(float value) => value > 0;
     }
-
     public class AmmoStatGenerator : RandomStatGenerator {
         public override string StatName => "Ammo";
 
@@ -134,7 +126,6 @@ namespace RandomCardsGenerators.StatsGroup {
         public override bool ShouldApply(float value) => Mathf.RoundToInt(value) != 0;
         public override bool IsPositive(float value) => value > 0;
     }
-
     public class AdditionalBlocksStatGenerator : RandomStatGenerator {
         public override string StatName => "Additiona Block";
 
@@ -147,7 +138,6 @@ namespace RandomCardsGenerators.StatsGroup {
         public override bool ShouldApply(float value) => Mathf.RoundToInt(value) != 0;
         public override bool IsPositive(float value) => value > 0;
     }
-
     public class ExtraLiveStatGenerator : RandomStatGenerator {
         public override string StatName => "Extra Live";
 
@@ -160,7 +150,6 @@ namespace RandomCardsGenerators.StatsGroup {
         public override bool ShouldApply(float value) => Mathf.RoundToInt(value) != 0;
         public override bool IsPositive(float value) => value > 0;
     }
-
     public class JumpStatGenerator : RandomStatGenerator {
         public override string StatName => "Jump";
 
