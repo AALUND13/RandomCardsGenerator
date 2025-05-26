@@ -156,7 +156,6 @@ namespace RandomCardsGenerators {
             var statCard = cardGameObject.GetComponent<CardInfo>();
             var buildRandomStatCard = cardGameObject.AddComponent<BuildRandomStatCard>();
 
-            GeneratedCardHolder.AddCardToGenerated(CardGenName, statCard);
 
             statCard.cardName = string.Format(CARD_NAME_FORMAT, randomCardInfo.CardName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
             statCard.cardDestription = randomCardInfo.CardDescription;
@@ -167,6 +166,8 @@ namespace RandomCardsGenerators {
 
             buildRandomStatCard.BuildUnityCard((cardInfo) => {
                 GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, cardInfo, selectedStats, random, seed);
+                GeneratedCardHolder.AddCardToGenerated(CardGenName, GeneratedCardData);
+
                 onCardGenerated?.Invoke(GeneratedCardData);
                 OnCardGenerated?.Invoke(GeneratedCardData);
 
