@@ -19,12 +19,11 @@ namespace RandomCardsGenerators {
 
         public void CreateRandomCard(string cardGenName, int seed, Player player = null) {
             var handler = GetHandler(cardGenName);
-            NetworkingManager.RaiseEvent(string.Format(RandomCardsGenerator.SYNC_EVENT_FORMAT, handler.CardGenName), seed, player.playerID);
+            handler.CreateRandomCard(seed, player);
         }
         public void CreateRandomCard(string cardGenName, Player player = null) {
             var handler = GetHandler(cardGenName);
-            int seed = UnityEngine.Random.Range(0, int.MaxValue);
-            NetworkingManager.RaiseEvent(string.Format(RandomCardsGenerator.SYNC_EVENT_FORMAT, handler.CardGenName), seed, player.playerID);
+            handler.CreateRandomCard(player);
         }
 
         public RandomCardsGenerator GetHandler(string statGenName) => CardsGenerators[statGenName];

@@ -109,6 +109,52 @@ namespace RandomCardsGenerators {
             });
         }
 
+        public void CreateRandomCard(int seed, Player player = null) {
+            NetworkingManager.RaiseEvent(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID);
+        }
+        public void CreateRandomCard(Player player = null) {
+            int seed = UnityEngine.Random.Range(0, int.MaxValue);
+            NetworkingManager.RaiseEvent(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID);
+        }
+
+        /// <summary>
+        /// Generates a random card with the given seed and player.
+        /// <para>NOTE: THIS WILL NOT BE CALLED ON ALL CLIENTS, ONLY ON THE CLIENT THAT CALLED IT.</para>
+        /// <para>Use <see cref="CreateRandomCard(string, int, Player)"/> or <see cref="CreateRandomCard(string, Player)"/> to sync the card generation across all clients.</para>
+        /// </summary>
+        public void GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
+            GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
+            GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
+            GameObject.DontDestroyOnLoad(cardGameObject);
+
+            var statCard = cardGameObject.GetComponent<CardInfo>();
+            var buildRandomStatCard = cardGameObject.AddComponent<BuildRandomStatCard>();
+
+            statCard.cardName = string.Format(CARD_NAME_FORMAT, CardGenName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
+            statCard.cardDestription = randomCardInfo.CardDescription;
+            statCard.rarity = randomCardInfo.CardRarity;
+            ModdingUtils.Utils.Cards.instance.AddHiddenCard(statCard);
+
+            var random = new System.Random(seed);
+            var selectedStats = ApplyRandomStats(statCard, random);
+
+            GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, statCard, selectedStats, random, seed);
+            GeneratedCardHolder.AddCardToGenerated(CardGenName, GeneratedCardData);
+
+            buildRandomStatCard.BuildUnityCard((cardInfo) => {
+                onCardGenerated?.Invoke(GeneratedCardData);
+                OnCardGenerated?.Invoke(GeneratedCardData);
+
+                if(player != null) {
+                    Main.instance.ExecuteAfterSeconds(0.2f, () => {
+                        ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, cardInfo, false, randomCardInfo.TwoLetterCode, 2f, 2f, true);
+                    });
+                }
+
+                LoggerUtils.LogInfo("Card built!");
+            });
+        }
+        
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {
             var statCard = cardInfo.gameObject.GetOrAddComponent<BuildRandomStatCard>();
             statCard.CardName = randomCardInfo.CardName;
@@ -141,39 +187,6 @@ namespace RandomCardsGenerators {
             LoggerUtils.LogInfo($"Generated {selectedStats.Length} stats for {cardInfo.cardName}.");
 
             return selectedStats;
-        }
-
-        public void GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
-            GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
-            GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
-            GameObject.DontDestroyOnLoad(cardGameObject);
-
-            var statCard = cardGameObject.GetComponent<CardInfo>();
-            var buildRandomStatCard = cardGameObject.AddComponent<BuildRandomStatCard>();
-
-            statCard.cardName = string.Format(CARD_NAME_FORMAT, CardGenName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
-            statCard.cardDestription = randomCardInfo.CardDescription;
-            statCard.rarity = randomCardInfo.CardRarity;
-            ModdingUtils.Utils.Cards.instance.AddHiddenCard(statCard);
-
-            var random = new System.Random(seed);
-            var selectedStats = ApplyRandomStats(statCard, random);
-
-            GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, statCard, selectedStats, random, seed);
-            GeneratedCardHolder.AddCardToGenerated(CardGenName, GeneratedCardData);
-
-            buildRandomStatCard.BuildUnityCard((cardInfo) => {
-                onCardGenerated?.Invoke(GeneratedCardData);
-                OnCardGenerated?.Invoke(GeneratedCardData);
-
-                if(player != null) {
-                    Main.instance.ExecuteAfterSeconds(0.2f, () => {
-                        ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, cardInfo, false, randomCardInfo.TwoLetterCode, 2f, 2f, true);
-                    });
-                }
-
-                LoggerUtils.LogInfo("Card built!");
-            });
         }
 
         private RandomStatInfo[] SelectRandomStats(System.Random random, int min, int max) {
