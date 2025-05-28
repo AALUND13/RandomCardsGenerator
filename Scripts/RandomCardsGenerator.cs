@@ -27,11 +27,23 @@ namespace RandomCardsGenerators {
         public string ModInitials;
         public string CardDescription;
         public string TwoLetterCode;
+
         public CardInfo.Rarity CardRarity;
+        public CardThemeColor.CardThemeColorType ColorTheme;
+
         public int Min;
         public int Max;
 
-        public RandomCardOption(string cardName, CardInfo.Rarity cardRarity, string modInitials, string cardDescription, string twoLetterCode, int min, int max) {
+        public RandomCardOption(
+            string cardName,
+            string modInitials,
+            string cardDescription,
+            string twoLetterCode,
+            int min,
+            int max,
+            CardInfo.Rarity cardRarity,
+            CardThemeColor.CardThemeColorType colorTheme = CardThemeColor.CardThemeColorType.TechWhite
+        ) {
             CardName = cardName;
             CardRarity = cardRarity;
             ModInitials = modInitials;
@@ -40,9 +52,6 @@ namespace RandomCardsGenerators {
             Min = min;
             Max = max;
         }
-
-        public RandomCardOption(string cardName, string cardRarity, string modInitials, string cardDescription, string twoLetterCode, int min, int max) :
-            this(cardName, RarityUtils.GetRarity(cardRarity), modInitials, cardDescription, twoLetterCode, min, max) { }
 
         public override string ToString() {
             return $"RandomCardOption: {CardName} | Rarity: {CardRarity} | ModInitials: {ModInitials} | Description: {CardDescription} | TwoLetterCode: {TwoLetterCode} | Min: {Min} | Max: {Max}";
@@ -133,6 +142,7 @@ namespace RandomCardsGenerators {
             statCard.cardName = string.Format(CARD_NAME_FORMAT, CardGenName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
             statCard.cardDestription = randomCardInfo.CardDescription;
             statCard.rarity = randomCardInfo.CardRarity;
+            statCard.colorTheme = randomCardInfo.ColorTheme;
             ModdingUtils.Utils.Cards.instance.AddHiddenCard(statCard);
 
             var random = new System.Random(seed);
@@ -154,7 +164,7 @@ namespace RandomCardsGenerators {
                 LoggerUtils.LogInfo("Card built!");
             });
         }
-        
+
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {
             var statCard = cardInfo.gameObject.GetOrAddComponent<BuildRandomStatCard>();
             statCard.CardName = randomCardInfo.CardName;
