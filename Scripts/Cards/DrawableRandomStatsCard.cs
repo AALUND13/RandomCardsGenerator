@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using RandomCardsGenerators.Utils;
+using System.Collections.Generic;
 using UnboundLib;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace RandomCardsGenerators.Cards {
     /// and <see href="https://github.com/AALUND13/CorruptedCardsManager/blob/main/Scripts/CorruptedCardsGenerators.cs#L26">CorruptedCardsGenerators</see> classes.</para>
     /// </summary>
     public class DrawableRandomStatsCard {
+        internal static List<DrawableRandomStatsCard> DrawableCards = new List<DrawableRandomStatsCard>();
         private static readonly System.Random random = new System.Random();
 
         public readonly RandomCardsGenerator StatCardGenerator;
@@ -24,7 +26,7 @@ namespace RandomCardsGenerators.Cards {
             GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
             GameObject.DontDestroyOnLoad(cardGameObject);
 
-            var card = cardGameObject.AddComponent<RandomStatsCard>();
+            var card = cardGameObject.AddComponent<RandomCard>();
             CardInfo = cardGameObject.GetComponent<CardInfo>();
             CardInfo.cardBase = Main.blankCardPrefab.GetComponent<CardInfo>().cardBase;
             CardInfo.rarity = statCardGenerator.randomCardInfo.CardRarity;
@@ -35,6 +37,7 @@ namespace RandomCardsGenerators.Cards {
 
             CardGameObject = cardGameObject;
             StatCardGenerator = statCardGenerator;
+            DrawableCards.Add(this);
         }
 
         public GameObject InstantiateCard(Vector3 position, Quaternion rotation, int seed, Vector3 localScale) {
@@ -52,7 +55,7 @@ namespace RandomCardsGenerators.Cards {
         }
     }
 
-    public class RandomStatsCard : MonoBehaviour, IPunInstantiateMagicCallback {
+    public class RandomCard : MonoBehaviour, IPunInstantiateMagicCallback {
         public string StatGenName;
 
         public void OnPhotonInstantiate(PhotonMessageInfo info) {
@@ -85,7 +88,7 @@ namespace RandomCardsGenerators.Cards {
                 var generatedRandom = new System.Random(seed);
 
                 generator.ApplyRandomStats(cardInfo, generatedRandom);
-                LoggerUtils.LogInfo($"Applied {stats.Length} stats to CardInfo {cardInfo.cardName}.");
+                LoggerUtils.LogInfo($"Applied {stats.Length} stats to toggleCardInfo {cardInfo.cardName}.");
 
                 cardInfo.sourceCard = generatedCardInfo.CardInfo;
                 cardInfo.cardStats = stats;
