@@ -1,6 +1,33 @@
 ﻿using UnityEngine;
 
 namespace RandomCardsGenerators.StatsGroup {
+    public class HealthStatGenerator : RandomStatGenerator {
+        public override string StatName => "Health";
+        public float ThresholdToZero;
+
+        public HealthStatGenerator(float minValue, float maxValue, float thresholdToZero = 0.05f) : base(minValue, maxValue) {
+            ThresholdToZero = thresholdToZero;
+        }
+
+        public override bool ShouldApply(float value) => Mathf.Abs(value) >= ThresholdToZero;
+        public override void Apply(float value, CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block) =>
+            statModifiers.health += value;
+        public override bool IsPositive(float value) => value > 0;
+    }
+    public class SizeStatGenerator : RandomStatGenerator {
+        public override string StatName => "Size";
+        public float ThresholdToZero;
+
+        public SizeStatGenerator(float minValue, float maxValue, float thresholdToZero = 0.05f) : base(minValue, maxValue) {
+            ThresholdToZero = thresholdToZero;
+        }
+
+        public override bool ShouldApply(float value) => Mathf.Abs(value) >= ThresholdToZero;
+        public override void Apply(float value, CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block) =>
+            statModifiers.sizeMultiplier += value;
+        public override bool IsPositive(float value) => value < 0;
+    }
+
     public class DamageStatGenerator : RandomStatGenerator {
         public override string StatName => "Damage";
         public float ThresholdToZero;
@@ -54,19 +81,6 @@ namespace RandomCardsGenerators.StatsGroup {
             statModifiers.movementSpeed += value;
         public override bool IsPositive(float value) => value > 0;
     }
-    public class HealthStatGenerator : RandomStatGenerator {
-        public override string StatName => "Health";
-        public float ThresholdToZero;
-
-        public HealthStatGenerator(float minValue, float maxValue, float thresholdToZero = 0.05f) : base(minValue, maxValue) {
-            ThresholdToZero = thresholdToZero;
-        }
-
-        public override bool ShouldApply(float value) => Mathf.Abs(value) >= ThresholdToZero;
-        public override void Apply(float value, CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block) =>
-            statModifiers.health += value;
-        public override bool IsPositive(float value) => value > 0;
-    }
     public class BlockCooldownStatGenerator : RandomStatGenerator {
         public override string StatName => "Block Cooldown";
         public float ThresholdToZero;
@@ -107,6 +121,19 @@ namespace RandomCardsGenerators.StatsGroup {
         public override string GetStatString(float value) => GetStringValue(value, false);
         public override bool IsPositive(float value) => value > 0;
     }
+    public class SpreadStatGenerator : RandomStatGenerator {
+        public override string StatName => "Spread";
+        public float ThresholdToZero;
+
+        public SpreadStatGenerator(float minValue, float maxValue, float thresholdToZero = 0.05f) : base(minValue, maxValue) {
+            ThresholdToZero = thresholdToZero;
+        }
+
+        public override bool ShouldApply(float value) => Mathf.Abs(value) >= ThresholdToZero;
+        public override void Apply(float value, CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block) =>
+            gun.spread += value;
+        public override bool IsPositive(float value) => value < 0;
+    }
     public class DragStatGenerator : RandomStatGenerator {
         public override string StatName => "Drag";
         public float ThresholdToZero;
@@ -119,5 +146,18 @@ namespace RandomCardsGenerators.StatsGroup {
         public override void Apply(float value, CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block) =>
             gun.drag += value;
         public override bool IsPositive(float value) => value < 0;
+    }
+    public class LifeSteelStatGenerator : RandomStatGenerator {
+        public override string StatName => "Life Steal";
+        public float ThresholdToZero;
+
+        public LifeSteelStatGenerator(float minValue, float maxValue, float thresholdToZero = 0.05f) : base(minValue, maxValue) {
+            ThresholdToZero = thresholdToZero;
+        }
+
+        public override bool ShouldApply(float value) => Mathf.Abs(value) >= ThresholdToZero;
+        public override void Apply(float value, CardInfo cardInfo, Gun gun, ApplyCardStats cardStats, CharacterStatModifiers statModifiers, Block block) =>
+            statModifiers.lifeSteal += value;
+        public override bool IsPositive(float value) => value > 0;
     }
 }
