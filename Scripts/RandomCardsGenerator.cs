@@ -129,7 +129,7 @@ namespace RandomCardsGenerators {
         /// <summary>
         /// Generates a random card with the given seed and player.
         /// <para>NOTE: THIS WILL NOT BE CALLED ON ALL CLIENTS, ONLY ON THE CLIENT THAT CALLED IT.</para>
-        /// <para>Use <see cref="CreateRandomCard(string, int, Player)"/> or <see cref="CreateRandomCard(string, Player)"/> to sync the card generation across all clients.</para>
+        /// <para>Use <see cref="CreateRandomCard(int, Player)"/> or <see cref="CreateRandomCard(Player)"/> to sync the card generation across all clients.</para>
         /// </summary>
         public void GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
