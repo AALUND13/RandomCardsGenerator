@@ -45,10 +45,11 @@ namespace RandomCardsGenerators {
             CardThemeColor.CardThemeColorType colorTheme = CardThemeColor.CardThemeColorType.TechWhite
         ) {
             CardName = cardName;
-            CardRarity = cardRarity;
             ModInitials = modInitials;
             CardDescription = cardDescription;
             TwoLetterCode = twoLetterCode;
+            CardRarity = cardRarity;
+            ColorTheme = colorTheme;
             Min = min;
             Max = max;
         }
