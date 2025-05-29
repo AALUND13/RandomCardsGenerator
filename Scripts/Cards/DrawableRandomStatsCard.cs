@@ -13,7 +13,7 @@ namespace RandomCardsGenerators.Cards {
     /// </summary>
     public class DrawableRandomStatsCard {
         internal static List<DrawableRandomStatsCard> DrawableCards = new List<DrawableRandomStatsCard>();
-        private static readonly System.Random random = new System.Random();
+        internal static readonly System.Random random = new System.Random();
 
         public readonly RandomCardsGenerator StatCardGenerator;
         public readonly GameObject CardGameObject;
@@ -57,15 +57,19 @@ namespace RandomCardsGenerators.Cards {
 
     public class RandomCard : MonoBehaviour, IPunInstantiateMagicCallback {
         public string StatGenName;
+        public bool IsInstantiate;
 
         public void OnPhotonInstantiate(PhotonMessageInfo info) {
             var data = info.photonView.InstantiationData;
             if(data == null) return;
 
             var seed = (int)data[0];
-            var localScale = (Vector3)data[1];
 
-            gameObject.transform.localScale = localScale;
+            if (data.Length > 1 && data[1] is Vector3) {
+                var localScale = (Vector3)data[1];
+                gameObject.transform.localScale = localScale;
+            }
+
             LoggerUtils.LogInfo($"Generating generatedRandom generatedCardInfo with seed {seed} using stat generator {StatGenName}");
 
             bool doesGeneratorExist = RandomCardsGenerator.RandomStatCardGenerators.TryGetValue(StatGenName, out var handler);
@@ -74,6 +78,8 @@ namespace RandomCardsGenerators.Cards {
             } else {
                 LoggerUtils.LogError($"Stat generator {StatGenName} does not exist.");
             }
+
+            IsInstantiate = true;
         }
 
         private void GenerateCard(RandomCardsGenerator generator, int seed) {
