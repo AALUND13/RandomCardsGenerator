@@ -88,6 +88,9 @@ namespace RandomCardsGenerators {
 
         internal static readonly Dictionary<string, RandomCardsGenerator> RandomStatCardGenerators = new Dictionary<string, RandomCardsGenerator>();
 
+        // Act like a cache for generated cards to prevents generating the same card multiple times.
+        public readonly Dictionary<int, GeneratedCardInfo> GeneratedCards = new Dictionary<int, GeneratedCardInfo>();
+
         public readonly List<RandomStatGenerator> StatGenerators;
         public readonly RandomCardOption randomCardInfo;
         public readonly string CardGenName;
@@ -133,6 +136,16 @@ namespace RandomCardsGenerators {
         /// <para>Use <see cref="CreateRandomCard(int, Player)"/> or <see cref="CreateRandomCard(Player)"/> to sync the card generation across all clients.</para>
         /// </summary>
         public void GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
+            if(GeneratedCards.ContainsKey(seed)) {
+                LoggerUtils.LogInfo($"Card with seed {seed} already generated for {CardGenName}. Returning existing card.");
+
+                onCardGenerated?.Invoke(GeneratedCards[seed]);
+                if (player != null)
+                    ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, GeneratedCards[seed].CardInfo, false, randomCardInfo.TwoLetterCode, 2f, 2f, true);
+
+                return;
+            }
+
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
             GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
             GameObject.DontDestroyOnLoad(cardGameObject);
@@ -151,6 +164,7 @@ namespace RandomCardsGenerators {
 
             GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, statCard, selectedStats, random, seed);
             GeneratedCardHolder.AddCardToGenerated(CardGenName, GeneratedCardData);
+            GeneratedCards[seed] = GeneratedCardData;
 
             buildRandomStatCard.BuildUnityCard((cardInfo) => {
                 onCardGenerated?.Invoke(GeneratedCardData);
