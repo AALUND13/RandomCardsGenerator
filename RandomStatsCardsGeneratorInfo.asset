@@ -15,8 +15,8 @@ MonoBehaviour:
   ModName: RandomCardsGenerator
   Author: AALUND13
   Version: 1.0.0
-  WebsiteURL: 
-  Description: A library for generating random cards.
+  WebsiteURL: https://github.com/AALUND13/RandomCardsGenerator
+  Description: 'A library for generating random cards with random stats.   '
   BeforeBuildCommand: 
   AfterBuildCommand: 
   Dependencies:
