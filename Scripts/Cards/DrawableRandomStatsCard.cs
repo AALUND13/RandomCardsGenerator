@@ -29,7 +29,10 @@ namespace RandomCardsGenerators.Cards {
             var card = cardGameObject.AddComponent<RandomCard>();
             CardInfo = cardGameObject.GetComponent<CardInfo>();
             CardInfo.cardBase = Main.blankCardPrefab.GetComponent<CardInfo>().cardBase;
-            CardInfo.rarity = statCardGenerator.randomCardInfo.CardRarity;
+            CardInfo.rarity = statCardGenerator.RandomCardOption.CardRarity;
+            CardInfo.cardName = statCardGenerator.RandomCardOption.CardName;
+            CardInfo.cardDestription = statCardGenerator.RandomCardOption.CardDescription;
+            CardInfo.colorTheme = statCardGenerator.RandomCardOption.ColorTheme;
 
             card.StatGenName = statCardGenerator.CardGenName;
 
