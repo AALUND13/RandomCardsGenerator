@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace RandomCardsGenerators.Cards {
     public class ToggleCard {
-        public static readonly CardCategory ToggleCardCategory = CustomCardCategories.instance.CardCategory("ToggleCardCategory");
         internal static readonly List<ToggleCard> ToggleCards = new List<ToggleCard>();
 
         public readonly CardInfo toggleCardInfo;
@@ -26,7 +25,6 @@ namespace RandomCardsGenerators.Cards {
             cardInfo.cardName = cardName;
             cardInfo.cardDestription = cardDescription;
             cardInfo.cardBase = Main.blankCardPrefab.GetComponent<CardInfo>().cardBase;
-            cardInfo.categories = new CardCategory[] { ToggleCardCategory };
             cardInfo.rarity = CardInfo.Rarity.Common;
             cardInfo.colorTheme = colorTheme;
             card.ModInitials = modInitials;

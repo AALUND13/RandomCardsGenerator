@@ -5,7 +5,7 @@ namespace RandomCardsGenerators.Cards {
         public static List<NormalDrawableRandomCard> NormalDrawableCards = new List<NormalDrawableRandomCard>();
 
         /// <summary>
-        /// This is the toggle card that will be created for this normal drawable card.
+        /// This is the toggle card that can be created for this normal drawable card.
         /// Note: This can be null if the card was created without a toggle card.
         /// </summary>
         public ToggleCard ToggleCard;
