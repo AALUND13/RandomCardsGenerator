@@ -179,27 +179,19 @@ Here is a list of the available stat generators:
 - `LifeSteelStatGenerator`
 
 ## Making Cards Appear In-Game
-The library provides a convenient way to make your random cards appear as physical cards in the game using the `DrawableRandomStatsCard` class. This is essential for creating pickable cards that appear in players' hands.
+The library provides two classes to make your random cards appear as physical cards in the game world: `DrawableRandomCard` and `NormalDrawableRandomCard`.
 
-### Using DrawableRandomStatsCard
-
+### Using `NormalDrawableRandomCard`
+The `NormalDrawableRandomCard` class extends `DrawableRandomCard` to provide a simpler implementation that works with **ROUNDS** standard card system.
 ```csharp
-// Create a drawable random stats card using your generator
-var drawableCard = new DrawableRandomStatsCard(randomCardsGenerator);
-
-// Replace an existing card with a random one
-CardInfo existingCard = someExistingCard;
-GameObject newCardObject = drawableCard.ReplaceCard(existingCard);
+// Create a normal drawable random card
+NormalDrawableRandomCard drawableCard = new NormalDrawableRandomCard(
+    randomCardsGenerator, // The RandomCardsGenerator instance
+    true                  // Whether to create a Toggle Card (optional, defaults to true)
+);
 ```
 
-### Implementation Notes
+After creating a `NormalDrawableRandomCard`, the card will be automatically registered and can appear in the game's card selection.
 
-To integrate random card generation into your mod's card selection system, you'll likely need additional code. For a complete example, see the [Corrupted Cards Manager](https://github.com/AALUND13/CorruptedCardsManager) which implements:
-
-1. Card spawning in player hands
-2. Custom card appearance
-3. Integration with the game's card selection system
-
-Specifically, look at these files in that project:
-- [SpawnUniqueCardPatch.cs](https://github.com/AALUND13/CorruptedCardsManager/blob/main/Scripts/Patches/SpawnUniqueCard.cs)
-- [CorruptedCardsGenerators.cs](https://github.com/AALUND13/CorruptedCardsManager/blob/main/Scripts/CorruptedCardsGenerators.cs)
+### Implementation Details
+For advanced usage, see the [Corrupted Cards Manager](https://github.com/AALUND13/CorruptedCardsManager) project which implements a custom card spawning system. 
