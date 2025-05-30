@@ -21,7 +21,7 @@ namespace RandomCardsGenerators.Cards {
 
         public DrawableRandomStatsCard(RandomCardsGenerator statCardGenerator) {
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
-            cardGameObject.name = $"__{statCardGenerator.randomCardInfo.ModInitials}__{statCardGenerator.CardGenName}_DrawableCard";
+            cardGameObject.name = $"__{statCardGenerator.RandomCardOption.ModInitials}__{statCardGenerator.CardGenName}_DrawableCard";
 
             GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
             GameObject.DontDestroyOnLoad(cardGameObject);
@@ -101,7 +101,7 @@ namespace RandomCardsGenerators.Cards {
                 generatedCardInfo.RandomCardsGenerator.OnCardGenerated?.Invoke(newGeneratedCardInfo);
 
                 CardInfoDisplayer displayer = gameObject.GetComponentInChildren<CardInfoDisplayer>();
-                displayer.DrawCard(stats, generator.randomCardInfo.CardName, generator.randomCardInfo.CardDescription);
+                displayer.DrawCard(stats, generator.RandomCardOption.CardName, generator.RandomCardOption.CardDescription);
                 LoggerUtils.LogInfo($"Card {cardInfo.cardName} displayed with {stats.Length} stats.");
 
                 // This type only exist when the 'DeckCustomization' mod is installed, So we check if it exists before adding it.

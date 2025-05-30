@@ -92,12 +92,12 @@ namespace RandomCardsGenerators {
         public readonly Dictionary<int, GeneratedCardInfo> GeneratedCards = new Dictionary<int, GeneratedCardInfo>();
 
         public readonly List<RandomStatGenerator> StatGenerators;
-        public readonly RandomCardOption randomCardInfo;
+        public readonly RandomCardOption RandomCardOption;
         public readonly string CardGenName;
 
         public Action<GeneratedCardInfo> OnCardGenerated;
 
-        public RandomCardsGenerator(string cardGenName, RandomCardOption randomCardInfo, List<RandomStatGenerator> statGenerators) {
+        public RandomCardsGenerator(string cardGenName, RandomCardOption randomCardOption, List<RandomStatGenerator> statGenerators) {
             if(RandomStatCardGenerators.ContainsKey(cardGenName))
                 throw new Exception($"A RandomCardsGenerators with the name {cardGenName} already exists!");
             else if(string.IsNullOrEmpty(cardGenName) || string.IsNullOrWhiteSpace(cardGenName))
@@ -105,7 +105,7 @@ namespace RandomCardsGenerators {
 
             RandomStatCardGenerators.Add(cardGenName, this);
 
-            this.randomCardInfo = randomCardInfo;
+            this.RandomCardOption = randomCardOption;
             this.CardGenName = cardGenName;
             StatGenerators = statGenerators;
 
@@ -141,7 +141,7 @@ namespace RandomCardsGenerators {
 
                 onCardGenerated?.Invoke(GeneratedCards[seed]);
                 if (player != null)
-                    ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, GeneratedCards[seed].CardInfo, false, randomCardInfo.TwoLetterCode, 2f, 2f, true);
+                    ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, GeneratedCards[seed].CardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
 
                 return;
             }
@@ -154,9 +154,9 @@ namespace RandomCardsGenerators {
             var buildRandomStatCard = cardGameObject.AddComponent<BuildRandomStatCard>();
 
             statCard.cardName = string.Format(CARD_NAME_FORMAT, CardGenName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
-            statCard.cardDestription = randomCardInfo.CardDescription;
-            statCard.rarity = randomCardInfo.CardRarity;
-            statCard.colorTheme = randomCardInfo.ColorTheme;
+            statCard.cardDestription = RandomCardOption.CardDescription;
+            statCard.rarity = RandomCardOption.CardRarity;
+            statCard.colorTheme = RandomCardOption.ColorTheme;
             ModdingUtils.Utils.Cards.instance.AddHiddenCard(statCard);
 
             var random = new System.Random(seed);
@@ -172,7 +172,7 @@ namespace RandomCardsGenerators {
 
                 if(player != null) {
                     Main.instance.ExecuteAfterSeconds(0.2f, () => {
-                        ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, cardInfo, false, randomCardInfo.TwoLetterCode, 2f, 2f, true);
+                        ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, cardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
                     });
                 }
 
@@ -182,8 +182,8 @@ namespace RandomCardsGenerators {
 
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {
             var statCard = cardInfo.gameObject.GetOrAddComponent<BuildRandomStatCard>();
-            statCard.CardName = randomCardInfo.CardName;
-            statCard.ModInitials = randomCardInfo.ModInitials;
+            statCard.CardName = RandomCardOption.CardName;
+            statCard.ModInitials = RandomCardOption.ModInitials;
 
             var gun = cardInfo.GetComponent<Gun>();
             var statModifiers = cardInfo.GetComponent<CharacterStatModifiers>();
@@ -192,8 +192,8 @@ namespace RandomCardsGenerators {
 
             LoggerUtils.LogInfo($"Generating random stats for {cardInfo.cardName}...");
 
-            int minClamped = Mathf.Max(0, randomCardInfo.Min);
-            int maxClamped = Mathf.Clamp(randomCardInfo.Max, minClamped, StatGenerators.Count);
+            int minClamped = Mathf.Max(0, RandomCardOption.Min);
+            int maxClamped = Mathf.Clamp(RandomCardOption.Max, minClamped, StatGenerators.Count);
 
             var selectedStats = SelectRandomStats(random, minClamped, maxClamped);
             cardInfo.cardStats = new CardInfoStat[selectedStats.Length];
@@ -243,7 +243,7 @@ namespace RandomCardsGenerators {
         }
 
         public override string ToString() {
-            return $"RandomCardsGenerator: {CardGenName} | CardName: {randomCardInfo.CardName} | Rarity: {randomCardInfo.CardRarity} | Min: {randomCardInfo.Min} | Max: {randomCardInfo.Max}";
+            return $"RandomCardsGenerator: {CardGenName} | CardName: {RandomCardOption.CardName} | Rarity: {RandomCardOption.CardRarity} | Min: {RandomCardOption.Min} | Max: {RandomCardOption.Max}";
         }
     }
 }
