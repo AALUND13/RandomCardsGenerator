@@ -1,6 +1,5 @@
 # RandomCardsGenerator
 A library for generating random cards with random stats.   
-For example, you can take a look at the [Corrupted Cards Manager](https://github.com/AALUND13/CorruptedCardsManager) which uses this library.
 
 ## Table of Contents
 - [Getting Started](#getting-started)
