@@ -29,7 +29,7 @@ namespace RandomCardsGenerators.Cards {
             cardInfo.colorTheme = colorTheme;
             card.ModInitials = modInitials;
 
-            card.RegisterUnityCard((cardInfo) => {
+            card.RegisterUnityCard((RegisterCardInfo) => {
 
                 LoggerUtils.LogInfo($"Register toggle card {cardName} with description: {cardDescription} and mod initials: {modInitials}");
             });
