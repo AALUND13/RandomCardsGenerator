@@ -38,13 +38,29 @@ namespace RandomCardsGenerators.Patches {
     [HarmonyPatch(typeof(CardChoicePatchGetRanomCard), "OrignialGetRanomCard", new Type[] { typeof(CardInfo[]) })]
     public class CardChoicePatchGetRanomCardPatch {
         private static void Prefix(ref CardInfo[] cards) {
-            if (!SpawnUniqueCardPatch.PickPhaseCardSpawning) return;
+            if(!SpawnUniqueCardPatch.PickPhaseCardSpawning) return;
 
             List<CardInfo> list = new List<CardInfo>(cards);
-            foreach(var drawableNormalCard in NormalDrawableRandomStatsCard.NormalDrawableCards) {
+            foreach(var drawableNormalCard in NormalDrawableRandomCard.NormalDrawableCards) {
                 list.Add(drawableNormalCard.CardInfo);
             }
             cards = list.ToArray();
+        }
+    }
+
+    [HarmonyPatch(typeof(ModdingUtils.Utils.Cards), "AddCardToPlayer", new Type[] { typeof(Player), typeof(CardInfo), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(bool) })]
+    public class AddCardToPlayerPatch {
+        private static bool Prefix(Player player, CardInfo card) {
+            if(card.GetComponent<ToggleCustomCard>() != null && (PhotonNetwork.OfflineMode || PhotonNetwork.IsMasterClient)) {
+                foreach(var drawableCard in NormalDrawableRandomCard.NormalDrawableCards) {
+                    if(drawableCard.ToggleCard != null && drawableCard.ToggleCard.toggleCardInfo == card) {
+                        drawableCard.StatCardGenerator.CreateRandomCard(player);
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }

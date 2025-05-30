@@ -1,8 +1,10 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using RandomCardsGenerators.Cards;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RandomCardsGenerators {
@@ -42,6 +44,13 @@ namespace RandomCardsGenerators {
             Debug.Log($"{modName} loaded!");
         }
         void Start() {
+            ModdingUtils.Utils.Cards.instance.AddCardValidationFunction((player, card) => {
+                if(ToggleCard.ToggleCards.Any(c => c.toggleCardInfo == card)) return false;
+                if(!ToggleCard.IsCardEnabled(card)) return true;
+
+                return true;
+            });
+
             if(BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("pykess.rounds.plugins.deckcustomization", out var plugin)) {
                 var assembly = plugin.Instance.GetType().Assembly;
                 RarityTextType = assembly.GetType("DeckCustomization.RarityText");
