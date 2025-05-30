@@ -11,15 +11,15 @@ namespace RandomCardsGenerators.Cards {
     /// <para>To be specific, Take a look at <see href="https://github.com/AALUND13/CorruptedCardsManager/blob/main/Scripts/Patches/SpawnUniqueCard.cs">SpawnUniqueCardPatch</see>
     /// and <see href="https://github.com/AALUND13/CorruptedCardsManager/blob/main/Scripts/CorruptedCardsGenerators.cs#L26">CorruptedCardsGenerators</see> classes.</para>
     /// </summary>
-    public class DrawableRandomStatsCard {
-        internal static List<DrawableRandomStatsCard> DrawableCards = new List<DrawableRandomStatsCard>();
+    public class DrawableRandomCard {
+        internal static List<DrawableRandomCard> DrawableCards = new List<DrawableRandomCard>();
         internal static readonly System.Random random = new System.Random();
 
         public readonly RandomCardsGenerator StatCardGenerator;
         public readonly GameObject CardGameObject;
         public readonly CardInfo CardInfo;
 
-        public DrawableRandomStatsCard(RandomCardsGenerator statCardGenerator) {
+        public DrawableRandomCard(RandomCardsGenerator statCardGenerator) {
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
             cardGameObject.name = $"__{statCardGenerator.RandomCardOption.ModInitials}__{statCardGenerator.CardGenName}_DrawableCard";
 

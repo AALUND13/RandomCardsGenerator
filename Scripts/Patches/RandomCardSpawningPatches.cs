@@ -17,7 +17,7 @@ namespace RandomCardsGenerators.Patches {
                     pos,
                     rot,
                     0,
-                    new object[] { DrawableRandomStatsCard.random.Next(int.MaxValue) }
+                    new object[] { DrawableRandomCard.random.Next(int.MaxValue) }
                 );
                 return false; // Skip original method
             }
