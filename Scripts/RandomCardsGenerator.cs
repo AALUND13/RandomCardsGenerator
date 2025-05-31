@@ -1,7 +1,6 @@
 ﻿using RandomCardsGenerators.Cards;
 using RandomCardsGenerators.Extensions;
 using RandomCardsGenerators.Utils;
-using RarityLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,10 +102,12 @@ namespace RandomCardsGenerators {
             else if(string.IsNullOrEmpty(cardGenName) || string.IsNullOrWhiteSpace(cardGenName))
                 throw new Exception("Card generator name cannot be null or empty!");
 
-            RandomStatCardGenerators.Add(cardGenName, this);
+            string sanitizedName = $"{randomCardOption.ModInitials}_{cardGenName.Sanitize()}";
+
+            RandomStatCardGenerators.Add(sanitizedName, this);
 
             this.RandomCardOption = randomCardOption;
-            this.CardGenName = cardGenName;
+            this.CardGenName = sanitizedName;
             StatGenerators = statGenerators;
 
             NetworkingManager.RegisterEvent(string.Format(SYNC_EVENT_FORMAT, cardGenName), (data) => {
