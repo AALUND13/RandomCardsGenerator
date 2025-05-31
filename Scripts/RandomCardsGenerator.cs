@@ -168,9 +168,6 @@ namespace RandomCardsGenerators {
             GeneratedCards[seed] = GeneratedCardData;
 
             buildRandomStatCard.BuildUnityCard((cardInfo) => {
-                onCardGenerated?.Invoke(GeneratedCardData);
-                OnCardGenerated?.Invoke(GeneratedCardData);
-
                 if(player != null) {
                     Main.instance.ExecuteAfterSeconds(0.2f, () => {
                         ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, cardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
@@ -179,6 +176,9 @@ namespace RandomCardsGenerators {
 
                 LoggerUtils.LogInfo("Card built!");
             });
+            
+            onCardGenerated?.Invoke(GeneratedCardData);
+            OnCardGenerated?.Invoke(GeneratedCardData);
         }
 
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {
