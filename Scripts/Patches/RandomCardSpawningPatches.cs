@@ -18,7 +18,6 @@ namespace RandomCardsGenerators.Patches {
 
             [HarmonyPriority(Priority.First)] private static void Prefix() => PickPhaseCardSpawning = true;
             [HarmonyPriority(Priority.First)] private static void Postfix() => PickPhaseCardSpawning = false;
-
         }
 
         [HarmonyPatch(typeof(CardChoice), "Spawn")]
@@ -33,9 +32,9 @@ namespace RandomCardsGenerators.Patches {
                     0,
                     new object[] { DrawableRandomCard.random.Next(int.MaxValue) }
                 );
-                return false; // Skip original method
+                return false;
             }
-            return true; // Continue with original method
+            return true;
         }
 
         [HarmonyPatch(typeof(ModdingUtils.Utils.Cards), "AddCardToPlayer", new Type[] { typeof(Player), typeof(CardInfo), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(bool) })]
