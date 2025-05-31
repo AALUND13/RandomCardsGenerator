@@ -5,7 +5,7 @@ using UnboundLib.Cards;
 using UnityEngine;
 
 namespace RandomCardsGenerators.Cards {
-    internal class BuildRandomStatCard : CustomCard {
+    internal class BuiltRandomCard : CustomCard {
         public string ModInitials;
         public string CardName;
 
@@ -19,6 +19,10 @@ namespace RandomCardsGenerators.Cards {
         }
 
         public override void OnAddCard(Player player, Gun gun, GunAmmo gunAmmo, CharacterData data, HealthHandler health, Gravity gravity, Block block, CharacterStatModifiers characterStats) { }
+        
+        public override bool GetEnabled() {
+            return false;
+        }
 
         protected override GameObject GetCardArt() {
             return cardInfo.cardArt;

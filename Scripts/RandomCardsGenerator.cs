@@ -151,7 +151,7 @@ namespace RandomCardsGenerators {
             GameObject.DontDestroyOnLoad(cardGameObject);
 
             var statCard = cardGameObject.GetComponent<CardInfo>();
-            var buildRandomStatCard = cardGameObject.AddComponent<BuildRandomStatCard>();
+            var buildRandomStatCard = cardGameObject.AddComponent<BuiltRandomCard>();
 
             statCard.cardName = string.Format(CARD_NAME_FORMAT, CardGenName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
             statCard.cardDestription = RandomCardOption.CardDescription;
@@ -181,7 +181,7 @@ namespace RandomCardsGenerators {
         }
 
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {
-            var statCard = cardInfo.gameObject.GetOrAddComponent<BuildRandomStatCard>();
+            var statCard = cardInfo.gameObject.GetOrAddComponent<BuiltRandomCard>();
             statCard.CardName = RandomCardOption.CardName;
             statCard.ModInitials = RandomCardOption.ModInitials;
 
