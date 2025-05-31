@@ -38,18 +38,6 @@ namespace RandomCardsGenerators.Patches {
             return true; // Continue with original method
         }
 
-        [HarmonyPatch(typeof(CardChoicePatchGetRanomCard), "OrignialGetRanomCard", new Type[] { typeof(CardInfo[]) })]
-        [HarmonyPrefix]
-        private static void NormalDrawableCardsSpawn(ref CardInfo[] cards) {
-            if(!SpawnUniqueCardPatch.PickPhaseCardSpawning) return;
-
-            List<CardInfo> list = new List<CardInfo>(cards);
-            foreach(var drawableNormalCard in NormalDrawableRandomCard.NormalDrawableCards) {
-                list.Add(drawableNormalCard.CardInfo);
-            }
-            cards = list.ToArray();
-        }
-
         [HarmonyPatch(typeof(ModdingUtils.Utils.Cards), "AddCardToPlayer", new Type[] { typeof(Player), typeof(CardInfo), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(bool) })]
         [HarmonyPrefix]
         private static bool AddRandomCardToPlayer(Player player, CardInfo card) {
@@ -74,6 +62,18 @@ namespace RandomCardsGenerators.Patches {
                 playerToUpgrade = PlayerManager.instance.players.Find(p => p.playerID == playerID);
                 findResult.RandomCardsGenerator.GenerateRandomCard(findResult.Seed);
             }
+        }
+
+        [HarmonyPatch(typeof(CardChoicePatchGetRanomCard), nameof(CardChoicePatchGetRanomCard.OrignialGetRanomCard), new Type[] { typeof(CardInfo[]) })]
+        [HarmonyPrefix]
+        private static void NormalDrawableCardsSpawn(ref CardInfo[] cards) {
+            if(!SpawnUniqueCardPatch.PickPhaseCardSpawning) return;
+
+            List<CardInfo> list = new List<CardInfo>(cards);
+            foreach(var drawableNormalCard in NormalDrawableRandomCard.NormalDrawableCards) {
+                list.Add(drawableNormalCard.CardInfo);
+            }
+            cards = list.ToArray();
         }
 
         [HarmonyPatch(typeof(CardManager), nameof(CardManager.GetCardInfoWithName))]
