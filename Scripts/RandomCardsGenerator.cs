@@ -176,6 +176,7 @@ namespace RandomCardsGenerators {
 
                 LoggerUtils.LogInfo("Card built!");
             });
+            cardGameObject.name = $"___RANDOM___{CardGenName}_({seed})".Sanitize();
             
             onCardGenerated?.Invoke(GeneratedCardData);
             OnCardGenerated?.Invoke(GeneratedCardData);
