@@ -136,15 +136,15 @@ namespace RandomCardsGenerators {
         /// <para>NOTE: THIS WILL NOT BE CALLED ON ALL CLIENTS, ONLY ON THE CLIENT THAT CALLED IT.</para>
         /// <para>Use <see cref="CreateRandomCard(int, Player)"/> or <see cref="CreateRandomCard(Player)"/> to sync the card generation across all clients.</para>
         /// </summary>
-        public void GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
+        public GameObject GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
             if(GeneratedCards.ContainsKey(seed)) {
                 LoggerUtils.LogInfo($"Card with seed {seed} already generated for {CardGenName}. Returning existing card.");
 
                 onCardGenerated?.Invoke(GeneratedCards[seed]);
-                if (player != null)
+                if(player != null)
                     ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, GeneratedCards[seed].CardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
 
-                return;
+                return GeneratedCards[seed].CardInfo.gameObject;
             }
 
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
@@ -180,6 +180,8 @@ namespace RandomCardsGenerators {
             
             onCardGenerated?.Invoke(GeneratedCardData);
             OnCardGenerated?.Invoke(GeneratedCardData);
+
+            return cardGameObject;
         }
 
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {
