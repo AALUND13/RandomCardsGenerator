@@ -110,7 +110,7 @@ namespace RandomCardsGenerators {
             this.CardGenName = sanitizedName;
             StatGenerators = statGenerators;
 
-            NetworkingManager.RegisterEvent(string.Format(SYNC_EVENT_FORMAT, cardGenName), (data) => {
+            NetworkingManager.RegisterEvent(string.Format(SYNC_EVENT_FORMAT, sanitizedName), (data) => {
                 try {
                     var seed = (int)data[0];
                     var playerID = (int)data[1];
@@ -118,7 +118,7 @@ namespace RandomCardsGenerators {
                     Player player = PlayerManager.instance.players.Find(p => p.playerID == playerID);
                     GenerateRandomCard(seed, player);
                 } catch(Exception e) {
-                    LoggerUtils.LogError($"Error generating random stats for {cardGenName}: {e}");
+                    LoggerUtils.LogError($"Error generating random stats for {sanitizedName}: {e}");
                 }
             });
         }
