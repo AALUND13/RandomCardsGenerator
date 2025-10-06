@@ -74,7 +74,7 @@ namespace RandomCardsGenerators.Cards {
             var localScale = (Vector3)data[1];
             Player player = null;
             if(data[2] != null) {
-                player = PlayerManager.instance.players.FirstOrDefault(player => player.playerID == (int)data[2]);
+                player = PlayerManager.instance.players.FirstOrDefault(p => p.playerID == (int)data[2]);
             }
 
             gameObject.transform.localScale = localScale;
