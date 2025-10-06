@@ -65,13 +65,16 @@ namespace RandomCardsGenerators {
         public System.Random Random;
         public int Seed;
 
+        public Player Player;
+
         public bool HasValue =>
             RandomCardsGenerator != null && CardInfo != null && RandomStatInfos != null && RandomStatInfos.Length > 0;
 
-        public GeneratedCardInfo(RandomCardsGenerator randomCardsGenerator, CardInfo cardInfo, RandomStatInfo[] randomStatInfos, System.Random random, int seed) {
+        public GeneratedCardInfo(RandomCardsGenerator randomCardsGenerator, CardInfo cardInfo, RandomStatInfo[] randomStatInfos, System.Random random, int seed, Player player = null) {
             RandomCardsGenerator = randomCardsGenerator;
             CardInfo = cardInfo;
             RandomStatInfos = randomStatInfos;
+            Player = player;
             Random = random;
             Seed = seed;
         }
@@ -116,7 +119,12 @@ namespace RandomCardsGenerators {
                     var playerID = (int)data[1];
 
                     Player player = PlayerManager.instance.players.Find(p => p.playerID == playerID);
-                    GenerateRandomCard(seed, player);
+                    CardInfo generatedCard = GenerateRandomCard(seed, player).GetComponent<CardInfo>();
+                    if(player != null) {
+                        Main.instance.ExecuteAfterSeconds(0.2f, () => {
+                            ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, generatedCard, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
+                        });
+                    }
                 } catch(Exception e) {
                     LoggerUtils.LogError($"Error generating random stats for {sanitizedName}: {e}");
                 }
@@ -136,13 +144,13 @@ namespace RandomCardsGenerators {
         /// <para>NOTE: THIS WILL NOT BE CALLED ON ALL CLIENTS, ONLY ON THE CLIENT THAT CALLED IT.</para>
         /// <para>Use <see cref="CreateRandomCard(int, Player)"/> or <see cref="CreateRandomCard(Player)"/> to sync the card generation across all clients.</para>
         /// </summary>
-        public GameObject GenerateRandomCard(int seed, Player player = null, Action<GeneratedCardInfo> onCardGenerated = null) {
+        public GameObject GenerateRandomCard(int seed, Player requestPlayer = null, Action<GeneratedCardInfo> onCardGenerated = null) {
             if(GeneratedCards.ContainsKey(seed)) {
                 LoggerUtils.LogInfo($"Card with seed {seed} already generated for {CardGenName}. Returning existing card.");
 
                 onCardGenerated?.Invoke(GeneratedCards[seed]);
-                if(player != null)
-                    ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, GeneratedCards[seed].CardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
+                if(requestPlayer != null)
+                    ModdingUtils.Utils.Cards.instance.AddCardToPlayer(requestPlayer, GeneratedCards[seed].CardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
 
                 return GeneratedCards[seed].CardInfo.gameObject;
             }
@@ -163,17 +171,11 @@ namespace RandomCardsGenerators {
             var random = new System.Random(seed);
             var selectedStats = ApplyRandomStats(statCard, random);
 
-            GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, statCard, selectedStats, random, seed);
+            GeneratedCardInfo GeneratedCardData = new GeneratedCardInfo(this, statCard, selectedStats, random, seed, requestPlayer);
             GeneratedCardHolder.AddCardToGenerated(CardGenName, GeneratedCardData);
             GeneratedCards[seed] = GeneratedCardData;
 
             buildRandomStatCard.BuildUnityCard((cardInfo) => {
-                if(player != null) {
-                    Main.instance.ExecuteAfterSeconds(0.2f, () => {
-                        ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, cardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
-                    });
-                }
-
                 LoggerUtils.LogInfo("Card built!");
             });
             cardGameObject.name = $"___RANDOM___{CardGenName}_({seed})".Sanitize();

@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f53b16b43f44db45911ff17aee4901d, type: 3}
-  m_Name: RandomStatsCardsGeneratorInfo
+  m_Name: RandomCardsGeneratorInfo
   m_EditorClassIdentifier: 
   ModName: RandomCardsGenerator
   Author: AALUND13
-  Version: 1.0.0
+  Version: 1.0.1
   WebsiteURL: https://github.com/AALUND13/RandomCardsGenerator
   Description: 'A library for generating random cards with random stats.   '
   BeforeBuildCommand: 

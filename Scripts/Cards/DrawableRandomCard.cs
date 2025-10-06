@@ -1,6 +1,7 @@
 ﻿using Photon.Pun;
 using RandomCardsGenerators.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using UnboundLib;
 using UnityEngine;
 
@@ -43,19 +44,22 @@ namespace RandomCardsGenerators.Cards {
             DrawableCards.Add(this);
         }
 
-        public GameObject InstantiateCard(Vector3 position, Quaternion rotation, int seed, Vector3 localScale) {
+        public GameObject InstantiateCard(Vector3 position, Quaternion rotation, int seed, Vector3 localScale, Player requestPlayer = null) {
             return PhotonNetwork.Instantiate(
                 CardGameObject.name,
                 position,
                 rotation,
                 0,
-                new object[] { seed, localScale }
+                new object[] { seed, localScale, requestPlayer?.playerID }
             );
         }
-        public GameObject ReplaceCard(CardInfo cardInfo) {
+
+        public GameObject ReplaceCard(CardInfo cardInfo, Player requestPlayer) {
             Main.instance.ExecuteAfterFrames(3, () => PhotonNetwork.Destroy(cardInfo.gameObject));
-            return InstantiateCard(cardInfo.transform.position, cardInfo.transform.rotation, random.Next(int.MaxValue), cardInfo.transform.localScale);
+            return InstantiateCard(cardInfo.transform.position, cardInfo.transform.rotation, random.Next(int.MaxValue), cardInfo.transform.localScale, requestPlayer);
         }
+
+        public GameObject ReplaceCard(CardInfo cardInfo) => ReplaceCard(cardInfo, null);
     }
 
     public class RandomCard : MonoBehaviour, IPunInstantiateMagicCallback {
@@ -67,17 +71,19 @@ namespace RandomCardsGenerators.Cards {
             if(data == null) return;
 
             var seed = (int)data[0];
-
-            if (data.Length > 1 && data[1] is Vector3) {
-                var localScale = (Vector3)data[1];
-                gameObject.transform.localScale = localScale;
+            var localScale = (Vector3)data[1];
+            Player player = null;
+            if(data[2] != null) {
+                player = PlayerManager.instance.players.FirstOrDefault(player => player.playerID == (int)data[2]);
             }
+
+            gameObject.transform.localScale = localScale;
 
             LoggerUtils.LogInfo($"Generating generatedRandom generatedCardInfo with seed {seed} using stat generator {StatGenName}");
 
             bool doesGeneratorExist = RandomCardsGenerator.RandomStatCardGenerators.TryGetValue(StatGenName, out var handler);
             if(doesGeneratorExist) {
-                GenerateCard(handler, seed);
+                GenerateCard(handler, seed, player);
             } else {
                 LoggerUtils.LogError($"Stat generator {StatGenName} does not exist.");
             }
@@ -85,10 +91,10 @@ namespace RandomCardsGenerators.Cards {
             IsInstantiate = true;
         }
 
-        private void GenerateCard(RandomCardsGenerator generator, int seed) {
+        private void GenerateCard(RandomCardsGenerator generator, int seed, Player requestPlayer) {
             var cardInfo = GetComponent<CardInfo>();
 
-            generator.GenerateRandomCard(seed, null, (generatedCardInfo) => {
+            generator.GenerateRandomCard(seed, requestPlayer, (generatedCardInfo) => {
                 LoggerUtils.LogInfo($"CardGenerator: {generator}");
                 LoggerUtils.LogInfo($"GeneratedCardInfo: {generatedCardInfo}");
 
