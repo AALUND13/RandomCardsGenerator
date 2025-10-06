@@ -1,9 +1,11 @@
-﻿using RandomCardsGenerators.Cards;
+﻿using Photon.Realtime;
+using RandomCardsGenerators.Cards;
 using RandomCardsGenerators.Extensions;
 using RandomCardsGenerators.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnboundLib;
 using UnityEngine;
 
@@ -149,11 +151,14 @@ namespace RandomCardsGenerators {
                 LoggerUtils.LogInfo($"Card with seed {seed} already generated for {CardGenName}. Returning existing card.");
 
                 onCardGenerated?.Invoke(GeneratedCards[seed]);
-                if(requestPlayer != null)
-                    ModdingUtils.Utils.Cards.instance.AddCardToPlayer(requestPlayer, GeneratedCards[seed].CardInfo, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
 
                 return GeneratedCards[seed].CardInfo.gameObject;
             }
+
+            StringBuilder debugLog = new StringBuilder();
+            debugLog.AppendLine($"Generating card from {CardGenName}");
+            debugLog.AppendLine($"Receive Data: \nSeed: {seed}\nPlayer Id: {(requestPlayer.playerID.ToString() ?? "None")}");
+            LoggerUtils.LogInfo(debugLog.ToString());
 
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
             GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
@@ -221,7 +226,7 @@ namespace RandomCardsGenerators {
         }
 
         private RandomStatInfo[] SelectRandomStats(System.Random random, int min, int max) {
-            LoggerUtils.LogInfo($"Selecting random stats for {CardGenName}...");
+            LoggerUtils.LogInfo($"Selecting random stats for '{CardGenName}'");
 
             int clampedMin = Mathf.Clamp(min, 0, StatGenerators.Count);
             int clampedMax = Mathf.Clamp(max, clampedMin, StatGenerators.Count);
@@ -243,7 +248,7 @@ namespace RandomCardsGenerators {
                     LoggerUtils.LogInfo($"Selected stat {selected[selectedGenerator.Count - 1].StatGenerator.StatName} with value {selected[selectedGenerator.Count - 1].Value}.");
                 }
             }
-            LoggerUtils.LogInfo($"Selected {selectedGenerator.Count} stats for {CardGenName}.");
+            LoggerUtils.LogInfo($"Selected {selectedGenerator.Count} stats for '{CardGenName}'");
 
             return selected;
         }

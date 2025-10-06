@@ -12,7 +12,7 @@ namespace RandomCardsGenerators {
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("root.rarity.lib", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(modId, modName, "1.2.0")]
+    [BepInPlugin(modId, modName, "1.2.1")]
     [BepInProcess("Rounds.exe")]
     public class Main : BaseUnityPlugin {
         private const string modId = "com.aalund13.rounds.random_cards_generator";

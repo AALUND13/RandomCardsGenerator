@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ModName: RandomCardsGenerator
   Author: AALUND13
-  Version: 1.0.1
+  Version: 1.2.0
   WebsiteURL: https://github.com/AALUND13/RandomCardsGenerator
   Description: 'A library for generating random cards with random stats.   '
   BeforeBuildCommand: 
@@ -26,4 +26,5 @@ MonoBehaviour:
   - Root-RarityLib-1.2.8
   DllDependencies: []
   AssemblyDefinitionDependencies: []
+  Icon: {fileID: 2800000, guid: 5fc6d1535d90bc24bb6cddc8b2f6e1cd, type: 3}
   IncludeInAllExports: 1

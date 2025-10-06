@@ -1,7 +1,9 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using RandomCardsGenerators.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnboundLib;
 using UnityEngine;
 
@@ -42,9 +44,12 @@ namespace RandomCardsGenerators.Cards {
             CardGameObject = cardGameObject;
             StatCardGenerator = statCardGenerator;
             DrawableCards.Add(this);
+
+            LoggerUtils.LogInfo($"Created drawable card for '{statCardGenerator.CardGenName}'");
         }
 
         public GameObject InstantiateCard(Vector3 position, Quaternion rotation, int seed, Vector3 localScale, Player requestPlayer = null) {
+            LoggerUtils.LogInfo($"Instantiating '{StatCardGenerator.CardGenName}'. {(requestPlayer != null ? $"Requesting Player Id: {requestPlayer.playerID}" : "")}");
             return PhotonNetwork.Instantiate(
                 CardGameObject.name,
                 position,
@@ -55,6 +60,7 @@ namespace RandomCardsGenerators.Cards {
         }
 
         public GameObject ReplaceCard(CardInfo cardInfo, Player requestPlayer) {
+            LoggerUtils.LogInfo($"Replacing card '{cardInfo.name}' with '{StatCardGenerator.CardGenName}'. {(requestPlayer != null ? $"Requesting Player Id: {requestPlayer.playerID}" : "")}");
             Main.instance.ExecuteAfterFrames(3, () => PhotonNetwork.Destroy(cardInfo.gameObject));
             return InstantiateCard(cardInfo.transform.position, cardInfo.transform.rotation, random.Next(int.MaxValue), cardInfo.transform.localScale, requestPlayer);
         }
@@ -80,6 +86,7 @@ namespace RandomCardsGenerators.Cards {
             gameObject.transform.localScale = localScale;
 
             LoggerUtils.LogInfo($"Generating generatedRandom generatedCardInfo with seed {seed} using stat generator {StatGenName}");
+            LoggerUtils.LogInfo($"Receive Data: \nSeed: {seed}\nlocalScale: {localScale}\nPlayer Id: {(player.playerID.ToString() ?? "None")}");
 
             bool doesGeneratorExist = RandomCardsGenerator.RandomStatCardGenerators.TryGetValue(StatGenName, out var handler);
             if(doesGeneratorExist) {
@@ -94,11 +101,16 @@ namespace RandomCardsGenerators.Cards {
         private void GenerateCard(RandomCardsGenerator generator, int seed, Player requestPlayer) {
             var cardInfo = GetComponent<CardInfo>();
 
+            StringBuilder debugLog = new StringBuilder();
+            debugLog.AppendLine($"Creating card from {generator.CardGenName}' cards generator");
+            debugLog.AppendLine($"Data: \nSeed: {seed}\nPlayer Id: {(requestPlayer.playerID.ToString() ?? "None")}");
+            LoggerUtils.LogInfo(debugLog.ToString());
+            
             generator.GenerateRandomCard(seed, requestPlayer, (generatedCardInfo) => {
                 LoggerUtils.LogInfo($"CardGenerator: {generator}");
                 LoggerUtils.LogInfo($"GeneratedCardInfo: {generatedCardInfo}");
 
-                var newGeneratedCardInfo = new GeneratedCardInfo(generator, cardInfo, generatedCardInfo.RandomStatInfos, generatedCardInfo.Random, seed);
+                var newGeneratedCardInfo = new GeneratedCardInfo(generator, cardInfo, generatedCardInfo.RandomStatInfos, generatedCardInfo.Random, seed, requestPlayer);
                 var stats = generatedCardInfo.CardInfo.cardStats;
                 var generatedRandom = new System.Random(seed);
 
