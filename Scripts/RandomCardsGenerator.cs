@@ -86,20 +86,29 @@ namespace RandomCardsGenerators {
         }
     }
 
+    public class GeneratorEventsActions {
+        public Action<GeneratedCardInfo> OnCardGenerated;
+        public Action<GeneratedCardInfo> OnCardBuilt;
+    }
+
     public class RandomCardsGenerator {
         internal const string SYNC_EVENT_FORMAT = "{0}_SyncEvent";
-        internal const string CARD_NAME_FORMAT = "{0} Card ({1})";
+        internal const string CARD_NAME_FORMAT = "{0} (Seed : {1})";
 
         internal static readonly Dictionary<string, RandomCardsGenerator> RandomStatCardGenerators = new Dictionary<string, RandomCardsGenerator>();
 
-        // Act like a cache for generated cards to prevents generating the same card multiple times.
-        public readonly Dictionary<int, GeneratedCardInfo> GeneratedCards = new Dictionary<int, GeneratedCardInfo>();
-
         public readonly List<RandomStatGenerator> StatGenerators;
+        public readonly GeneratorEventsActions GeneratorActions;
+
         public readonly RandomCardOption RandomCardOption;
         public readonly string CardGenName;
 
+        [Obsolete("This event is obsolete, please swith to the new 'Generator Actions' system")]
         public Action<GeneratedCardInfo> OnCardGenerated;
+
+        
+        // Act like a cache for generated cards to prevents generating the same card multiple times.
+        private readonly Dictionary<int, GeneratedCardInfo> GeneratedCards;
 
         public RandomCardsGenerator(string cardGenName, RandomCardOption randomCardOption, List<RandomStatGenerator> statGenerators) {
             if(RandomStatCardGenerators.ContainsKey(cardGenName))
@@ -109,11 +118,15 @@ namespace RandomCardsGenerators {
 
             string sanitizedName = $"{randomCardOption.ModInitials}_{cardGenName.Sanitize()}";
 
+            GeneratedCards = new Dictionary<int, GeneratedCardInfo>();
             RandomStatCardGenerators.Add(sanitizedName, this);
 
-            this.RandomCardOption = randomCardOption;
-            this.CardGenName = sanitizedName;
             StatGenerators = statGenerators;
+            GeneratorActions = new GeneratorEventsActions();
+            GeneratorActions.OnCardGenerated += (card) => OnCardGenerated?.Invoke(card);
+
+            RandomCardOption = randomCardOption;
+            CardGenName = sanitizedName;
 
             NetworkingManager.RegisterEvent(string.Format(SYNC_EVENT_FORMAT, sanitizedName), (data) => {
                 try {
@@ -121,7 +134,7 @@ namespace RandomCardsGenerators {
                     var playerID = (int)data[1];
 
                     Player player = PlayerManager.instance.players.Find(p => p.playerID == playerID);
-                    CardInfo generatedCard = GenerateRandomCard(seed, player).GetComponent<CardInfo>();
+                    CardInfo generatedCard = GenerateRandomCard(player, seed).GetComponent<CardInfo>();
                     if(player != null) {
                         Main.instance.ExecuteAfterSeconds(0.2f, () => {
                             ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, generatedCard, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
@@ -146,11 +159,12 @@ namespace RandomCardsGenerators {
         /// <para>NOTE: THIS WILL NOT BE CALLED ON ALL CLIENTS, ONLY ON THE CLIENT THAT CALLED IT.</para>
         /// <para>Use <see cref="CreateRandomCard(int, Player)"/> or <see cref="CreateRandomCard(Player)"/> to sync the card generation across all clients.</para>
         /// </summary>
-        public GameObject GenerateRandomCard(int seed, Player requestPlayer = null, Action<GeneratedCardInfo> onCardGenerated = null) {
+        public GameObject GenerateRandomCard(Player requestPlayer, int seed, GeneratorEventsActions generatorActions) {
             if(GeneratedCards.ContainsKey(seed)) {
                 LoggerUtils.LogInfo($"Card with seed {seed} already generated for {CardGenName}. Returning existing card.");
 
-                onCardGenerated?.Invoke(GeneratedCards[seed]);
+                generatorActions?.OnCardGenerated?.Invoke(GeneratedCards[seed]);
+                generatorActions?.OnCardBuilt?.Invoke(GeneratedCards[seed]);
 
                 return GeneratedCards[seed].CardInfo.gameObject;
             }
@@ -167,7 +181,7 @@ namespace RandomCardsGenerators {
             var statCard = cardGameObject.GetComponent<CardInfo>();
             var buildRandomStatCard = cardGameObject.AddComponent<BuiltRandomCard>();
 
-            statCard.cardName = string.Format(CARD_NAME_FORMAT, CardGenName, GeneratedCardHolder.GetGeneratedCards(CardGenName).Count);
+            statCard.cardName = string.Format(CARD_NAME_FORMAT, RandomCardOption.CardName, seed);
             statCard.cardDestription = RandomCardOption.CardDescription;
             statCard.rarity = RandomCardOption.CardRarity;
             statCard.colorTheme = RandomCardOption.ColorTheme;
@@ -181,14 +195,26 @@ namespace RandomCardsGenerators {
             GeneratedCards[seed] = GeneratedCardData;
 
             buildRandomStatCard.BuildUnityCard((cardInfo) => {
+                generatorActions?.OnCardBuilt?.Invoke(GeneratedCards[seed]);
+                GeneratorActions.OnCardBuilt?.Invoke(GeneratedCards[seed]);
+                
                 LoggerUtils.LogInfo("Card built!");
             });
             cardGameObject.name = $"___RANDOM___{CardGenName}_({seed})".Sanitize();
-            
-            onCardGenerated?.Invoke(GeneratedCardData);
-            OnCardGenerated?.Invoke(GeneratedCardData);
+
+            generatorActions?.OnCardGenerated?.Invoke(GeneratedCards[seed]);
+            GeneratorActions.OnCardGenerated?.Invoke(GeneratedCards[seed]);
 
             return cardGameObject;
+        }
+        public GameObject GenerateRandomCard(Player requestPlayer, int seed) => GenerateRandomCard(requestPlayer, seed, null);
+        public GameObject GenerateRandomCard(int seed) => GenerateRandomCard(null, seed, null);
+
+        [Obsolete("this 'GenerateRandomCard(Int, Player, Action<GeneratedCardInfo>)' method is obsolete, use 'GenerateRandomCard(Player requestPlayer, int seed, GeneratorEventsActions generatorActions)' or the other non-obsolete one insteads")]
+        public GameObject GenerateRandomCard(int seed, Player requestPlayer = null, Action<GeneratedCardInfo> onCardGenerated = null) {
+            GeneratorEventsActions generatorEventsActions = new GeneratorEventsActions();
+            generatorEventsActions.OnCardGenerated += (card) => onCardGenerated?.Invoke(card);
+            return GenerateRandomCard(seed, requestPlayer, onCardGenerated);
         }
 
         public RandomStatInfo[] ApplyRandomStats(CardInfo cardInfo, System.Random random) {

@@ -23,6 +23,8 @@ namespace RandomCardsGenerators.Cards {
         public readonly CardInfo CardInfo;
 
         public DrawableRandomCard(RandomCardsGenerator statCardGenerator) {
+            StatCardGenerator = statCardGenerator;
+
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
             cardGameObject.name = $"__{statCardGenerator.RandomCardOption.ModInitials}__{statCardGenerator.CardGenName}_DrawableCard";
 
@@ -30,19 +32,19 @@ namespace RandomCardsGenerators.Cards {
             GameObject.DontDestroyOnLoad(cardGameObject);
 
             var card = cardGameObject.AddComponent<RandomCard>();
+            card.StatGenName = statCardGenerator.CardGenName;
+
             CardInfo = cardGameObject.GetComponent<CardInfo>();
+            CardGameObject = cardGameObject;
+
             CardInfo.cardBase = Main.blankCardPrefab.GetComponent<CardInfo>().cardBase;
             CardInfo.rarity = statCardGenerator.RandomCardOption.CardRarity;
             CardInfo.cardName = statCardGenerator.RandomCardOption.CardName;
             CardInfo.cardDestription = statCardGenerator.RandomCardOption.CardDescription;
             CardInfo.colorTheme = statCardGenerator.RandomCardOption.ColorTheme;
 
-            card.StatGenName = statCardGenerator.CardGenName;
-
             PhotonNetwork.PrefabPool.RegisterPrefab(cardGameObject.name, cardGameObject);
 
-            CardGameObject = cardGameObject;
-            StatCardGenerator = statCardGenerator;
             DrawableCards.Add(this);
 
             LoggerUtils.LogInfo($"Created drawable card for '{statCardGenerator.CardGenName}'");
@@ -64,13 +66,11 @@ namespace RandomCardsGenerators.Cards {
             Main.instance.ExecuteAfterFrames(3, () => PhotonNetwork.Destroy(cardInfo.gameObject));
             return InstantiateCard(cardInfo.transform.position, cardInfo.transform.rotation, random.Next(int.MaxValue), cardInfo.transform.localScale, requestPlayer);
         }
-
         public GameObject ReplaceCard(CardInfo cardInfo) => ReplaceCard(cardInfo, null);
     }
 
     public class RandomCard : MonoBehaviour, IPunInstantiateMagicCallback {
         public string StatGenName;
-        public bool IsInstantiate;
 
         public void OnPhotonInstantiate(PhotonMessageInfo info) {
             var data = info.photonView.InstantiationData;
@@ -94,8 +94,6 @@ namespace RandomCardsGenerators.Cards {
             } else {
                 LoggerUtils.LogError($"Stat generator {StatGenName} does not exist.");
             }
-
-            IsInstantiate = true;
         }
 
         private void GenerateCard(RandomCardsGenerator generator, int seed, Player requestPlayer) {
@@ -106,7 +104,8 @@ namespace RandomCardsGenerators.Cards {
             debugLog.AppendLine($"Data: \nSeed: {seed}\nPlayer Id: {(requestPlayer.playerID.ToString() ?? "None")}");
             LoggerUtils.LogInfo(debugLog.ToString());
             
-            generator.GenerateRandomCard(seed, requestPlayer, (generatedCardInfo) => {
+            GeneratorEventsActions generatorActions = new GeneratorEventsActions();
+            generatorActions.OnCardBuilt += (generatedCardInfo) => {
                 LoggerUtils.LogInfo($"CardGenerator: {generator}");
                 LoggerUtils.LogInfo($"GeneratedCardInfo: {generatedCardInfo}");
 
@@ -119,7 +118,10 @@ namespace RandomCardsGenerators.Cards {
 
                 cardInfo.sourceCard = generatedCardInfo.CardInfo;
                 cardInfo.cardStats = stats;
-                generatedCardInfo.RandomCardsGenerator.OnCardGenerated?.Invoke(newGeneratedCardInfo);
+                cardInfo.cardName = string.Format(RandomCardsGenerator.CARD_NAME_FORMAT, generator.RandomCardOption.CardName, seed);
+
+                generatedCardInfo.RandomCardsGenerator.GeneratorActions.OnCardGenerated?.Invoke(newGeneratedCardInfo);
+                generatedCardInfo.RandomCardsGenerator.GeneratorActions.OnCardBuilt?.Invoke(newGeneratedCardInfo);
 
                 CardInfoDisplayer displayer = gameObject.GetComponentInChildren<CardInfoDisplayer>();
                 displayer.DrawCard(stats, generator.RandomCardOption.CardName, generator.RandomCardOption.CardDescription);
@@ -129,7 +131,9 @@ namespace RandomCardsGenerators.Cards {
                 if(Main.RarityTextType != null) {
                     gameObject.AddComponent(Main.RarityTextType);
                 }
-            });
+            };
+
+            generator.GenerateRandomCard(requestPlayer, seed, generatorActions);
         }
     }
 
