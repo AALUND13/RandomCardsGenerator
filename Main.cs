@@ -12,7 +12,7 @@ namespace RandomCardsGenerators {
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("root.rarity.lib", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(modId, modName, "1.2.1")]
+    [BepInPlugin(modId, modName, "1.2.2")]
     [BepInProcess("Rounds.exe")]
     public class Main : BaseUnityPlugin {
         private const string modId = "com.aalund13.rounds.random_cards_generator";
@@ -46,8 +46,7 @@ namespace RandomCardsGenerators {
 
         void Start() {
             ModdingUtils.Utils.Cards.instance.AddCardValidationFunction((player, card) => {
-                if(ToggleCard.ToggleCards.Any(c => c.toggleCardInfo == card)) return false;
-                if(!ToggleCard.IsCardEnabled(card)) return true;
+                if(!ToggleCard.IsCardEnabled(card)) return false;
 
                 return true;
             });

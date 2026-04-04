@@ -8,6 +8,7 @@ using UnityEngine;
 namespace RandomCardsGenerators.Cards {
     public class ToggleCard {
         internal static readonly List<ToggleCard> ToggleCards = new List<ToggleCard>();
+        internal static bool AllowedToggleCard = false;
 
         public readonly CardInfo toggleCardInfo;
         public List<CardInfo> cardsInToggle = new List<CardInfo>();

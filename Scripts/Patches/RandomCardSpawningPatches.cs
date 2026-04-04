@@ -5,6 +5,8 @@ using RandomCardsGenerators.Cards;
 using RandomCardsGenerators.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnboundLib;
 using UnboundLib.Utils;
 using UnityEngine;
 
@@ -25,12 +27,16 @@ namespace RandomCardsGenerators.Patches {
         [HarmonyPrefix]
         private static bool Spawn(GameObject objToSpawn, Vector3 pos, Quaternion rot, ref GameObject __result) {
             if(objToSpawn != null && objToSpawn.GetComponent<RandomCard>() != null) {
+                Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0) 
+                    ? PlayerManager.instance.players[CardChoice.instance.pickrID] 
+                    : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);
+
                 __result = PhotonNetwork.Instantiate(
                     objToSpawn.name,
                     pos,
                     rot,
                     0,
-                    new object[] { DrawableRandomCard.random.Next(int.MaxValue) }
+                    new object[] { DrawableRandomCard.random.Next(int.MaxValue), new Vector3(1, 1, 1), player.playerID }
                 );
                 return false;
             }
@@ -67,10 +73,16 @@ namespace RandomCardsGenerators.Patches {
         [HarmonyPrefix]
         private static void NormalDrawableCardsSpawn(ref CardInfo[] cards) {
             if(!SpawnUniqueCardPatch.PickPhaseCardSpawning) return;
+            Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0)
+                ? PlayerManager.instance.players[CardChoice.instance.pickrID]
+                : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);
 
             List<CardInfo> list = new List<CardInfo>(cards);
             foreach(var drawableNormalCard in NormalDrawableRandomCard.NormalDrawableCards) {
-                list.Add(drawableNormalCard.CardInfo);
+                if(list.Contains(drawableNormalCard.ToggleCard.toggleCardInfo)) {
+                    list.Remove(drawableNormalCard.ToggleCard.toggleCardInfo);
+                    list.Add(drawableNormalCard.CardInfo);
+                }
             }
             cards = list.ToArray();
         }

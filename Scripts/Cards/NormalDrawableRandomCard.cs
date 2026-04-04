@@ -10,12 +10,11 @@ namespace RandomCardsGenerators.Cards {
         /// </summary>
         public ToggleCard ToggleCard;
 
-        public NormalDrawableRandomCard(RandomCardsGenerator statCardGenerator, bool createToggleCard = true) : base(statCardGenerator) {
-            if(createToggleCard) {
-                var cardOption = statCardGenerator.RandomCardOption;
-                ToggleCard = new ToggleCard(new List<CardInfo> { CardInfo }, cardOption.CardName, cardOption.CardDescription, cardOption.ModInitials, cardOption.ColorTheme);
-                ToggleCard.toggleCardInfo.rarity = cardOption.CardRarity;
-            }
+        public NormalDrawableRandomCard(RandomCardsGenerator statCardGenerator) : base(statCardGenerator) {
+            var cardOption = statCardGenerator.RandomCardOption;
+            ToggleCard = new ToggleCard(new List<CardInfo> { CardInfo }, cardOption.CardName, cardOption.CardDescription, cardOption.ModInitials, cardOption.ColorTheme);
+            ToggleCard.toggleCardInfo.rarity = cardOption.CardRarity;
+
             NormalDrawableCards.Add(this);
         }
     }
