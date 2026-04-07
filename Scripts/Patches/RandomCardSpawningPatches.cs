@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using ModdingUtils.Patches;
 using Photon.Pun;
+using PickPhaseImprovements;
 using RandomCardsGenerators.Cards;
 using RandomCardsGenerators.Utils;
 using System;
@@ -22,26 +23,26 @@ namespace RandomCardsGenerators.Patches {
             [HarmonyPriority(Priority.First)] private static void Postfix() => PickPhaseCardSpawning = false;
         }
 
-        [HarmonyPatch(typeof(CardChoice), "Spawn")]
-        [HarmonyPriority(Priority.Last)]
-        [HarmonyPrefix]
-        private static bool Spawn(GameObject objToSpawn, Vector3 pos, Quaternion rot, ref GameObject __result) {
-            if(objToSpawn != null && objToSpawn.GetComponent<RandomCard>() != null) {
-                Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0) 
-                    ? PlayerManager.instance.players[CardChoice.instance.pickrID] 
-                    : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);
+        //[HarmonyPatch(typeof(CardChoice), "Spawn")]
+        //[HarmonyPriority(Priority.Last)]
+        //[HarmonyPrefix]
+        //private static bool Spawn(GameObject objToSpawn, Vector3 pos, Quaternion rot, ref GameObject __result) {
+        //    if(objToSpawn != null && objToSpawn.GetComponent<RandomCard>() != null) {
+        //        Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0) 
+        //            ? PlayerManager.instance.players[CardChoice.instance.pickrID] 
+        //            : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);
 
-                __result = PhotonNetwork.Instantiate(
-                    objToSpawn.name,
-                    pos,
-                    rot,
-                    0,
-                    new object[] { DrawableRandomCard.random.Next(int.MaxValue), new Vector3(1, 1, 1), player.playerID }
-                );
-                return false;
-            }
-            return true;
-        }
+        //        __result = PhotonNetwork.Instantiate(
+        //            objToSpawn.name,
+        //            pos,
+        //            rot,
+        //            0,
+        //            new object[] { DrawableRandomCard.random.Next(int.MaxValue), player.playerID }
+        //        );
+        //        return false;
+        //    }
+        //    return true;
+        //}
 
         [HarmonyPatch(typeof(ModdingUtils.Utils.Cards), "AddCardToPlayer", new Type[] { typeof(Player), typeof(CardInfo), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(bool) })]
         [HarmonyPrefix]
@@ -72,7 +73,6 @@ namespace RandomCardsGenerators.Patches {
         [HarmonyPatch(typeof(CardChoicePatchGetRanomCard), nameof(CardChoicePatchGetRanomCard.OrignialGetRanomCard), new Type[] { typeof(CardInfo[]) })]
         [HarmonyPrefix]
         private static void NormalDrawableCardsSpawn(ref CardInfo[] cards) {
-            if(!SpawnUniqueCardPatch.PickPhaseCardSpawning) return;
             Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0)
                 ? PlayerManager.instance.players[CardChoice.instance.pickrID]
                 : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);

@@ -154,6 +154,13 @@ namespace RandomCardsGenerators {
             NetworkingManager.RaiseEvent(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID);
         }
 
+        public GameObject CreateRandomCardForOther(Player player = null) {
+            int seed = UnityEngine.Random.Range(0, int.MaxValue);
+            GameObject creatorGenCard = GenerateRandomCard(player, seed);
+            NetworkingManager.RaiseEventOthers(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID);
+            return creatorGenCard;
+        }
+
         /// <summary>
         /// Generates a random card with the given seed and player.
         /// <para>NOTE: THIS WILL NOT BE CALLED ON ALL CLIENTS, ONLY ON THE CLIENT THAT CALLED IT.</para>

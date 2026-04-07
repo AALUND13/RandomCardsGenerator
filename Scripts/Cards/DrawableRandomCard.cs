@@ -57,7 +57,18 @@ namespace RandomCardsGenerators.Cards {
                 position,
                 rotation,
                 0,
-                new object[] { seed, localScale, requestPlayer?.playerID }
+                new object[] { seed, requestPlayer?.playerID ?? -1, localScale}
+            );
+        }
+
+        public GameObject InstantiateCard(Vector3 position, Quaternion rotation, int seed, Player requestPlayer = null) {
+            LoggerUtils.LogInfo($"Instantiating '{StatCardGenerator.CardGenName}'. {(requestPlayer != null ? $"Requesting Player Id: {requestPlayer.playerID}" : "")}");
+            return PhotonNetwork.Instantiate(
+                CardGameObject.name,
+                position,
+                rotation,
+                0,
+                new object[] { seed, requestPlayer?.playerID ?? -1 }
             );
         }
 
@@ -76,17 +87,23 @@ namespace RandomCardsGenerators.Cards {
             var data = info.photonView.InstantiationData;
             if(data == null) return;
 
-            var seed = (int)data[0];
-            var localScale = (Vector3)data[1];
+            LoggerUtils.LogInfo($"OnPhotonInstantiate called for '{StatGenName}' with data length: {data.Length}");
+
             Player player = null;
-            if(data[2] != null) {
-                player = PlayerManager.instance.players.FirstOrDefault(p => p.playerID == (int)data[2]);
+
+            var seed = (int)data[0];
+            if((int)data[1] != -1) {
+                player = PlayerManager.instance.players.FirstOrDefault(p => p.playerID == (int)data[1]);
             }
 
-            gameObject.transform.localScale = localScale;
+            if(data.Length >= 3) {
+                var localScale = (Vector3)data[2];
+                gameObject.transform.localScale = localScale;
+            }
+
 
             LoggerUtils.LogInfo($"Generating generatedRandom generatedCardInfo with seed {seed} using stat generator {StatGenName}");
-            LoggerUtils.LogInfo($"Receive Data: \nSeed: {seed}\nlocalScale: {localScale}\nPlayer Id: {(player.playerID.ToString() ?? "None")}");
+            LoggerUtils.LogInfo($"Receive Data: \nSeed: {seed}\nPlayer Id: {(player.playerID.ToString() ?? "None")}");
 
             bool doesGeneratorExist = RandomCardsGenerator.RandomStatCardGenerators.TryGetValue(StatGenName, out var handler);
             if(doesGeneratorExist) {

@@ -1,10 +1,12 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using PickPhaseImprovements;
 using RandomCardsGenerators.Cards;
+using RandomCardsGenerators.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using UnboundLib;
 using UnityEngine;
 
 namespace RandomCardsGenerators {
@@ -40,8 +42,6 @@ namespace RandomCardsGenerators {
 
             assets = Jotunn.Utils.AssetUtils.LoadAssetBundleFromResources("randomcardsgenerator_assets", typeof(Main).Assembly);
             blankCardPrefab = assets.LoadAsset<GameObject>("__RCG__BlankCard");
-
-            Debug.Log($"{modName} loaded!");
         }
 
         void Start() {
@@ -58,7 +58,27 @@ namespace RandomCardsGenerators {
                 DeckCustomizationPatch.Patch(harmony, assembly);
             }
 
-            Debug.Log($"{modName} started!");
+            PickManager.RegisterHandModificationFunction(ApplyRandomCardStats, Priority.High);
+        }
+
+        private static CardInfo[] ApplyRandomCardStats(CardInfo[] hand) {
+            Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0)
+                ? PlayerManager.instance.players[CardChoice.instance.pickrID]
+                : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);
+
+            for(int i = 0; i < hand.Length; i++) {
+                RandomCard randomCard = hand[i].GetComponent<RandomCard>();
+                if(randomCard != null) {
+                    bool doesGeneratorExist = RandomCardsGenerator.RandomStatCardGenerators.TryGetValue(randomCard.StatGenName, out var generator);
+                    if(doesGeneratorExist) {
+                        hand[i] = generator.CreateRandomCardForOther(player).GetComponent<CardInfo>();
+                        PickManager.RegisterAlternetSpawnName(hand[i], $"__{generator.RandomCardOption.ModInitials}__{hand[i].cardName}");
+                    } else {
+                        LoggerUtils.LogError($"Stat generator {randomCard.StatGenName} does not exist.");
+                    }
+                }
+            }
+            return hand;
         }
     }
 }
