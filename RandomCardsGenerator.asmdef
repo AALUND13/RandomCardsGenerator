@@ -5,7 +5,8 @@
         "ModdingUtils",
         "UnboundLib",
         "Unity.TextMeshPro",
-        "RarityLib"
+        "RarityLib",
+        "PickPhaseImprovements"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

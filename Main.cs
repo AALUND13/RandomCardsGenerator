@@ -1,10 +1,12 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using PickPhaseImprovements;
 using RandomCardsGenerators.Cards;
+using RandomCardsGenerators.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using UnboundLib;
 using UnityEngine;
 
 namespace RandomCardsGenerators {
@@ -12,7 +14,9 @@ namespace RandomCardsGenerators {
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("root.rarity.lib", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(modId, modName, "1.2.2")]
+    [BepInDependency("Systems.R00t.PickPhaseImprovements")]
+
+    [BepInPlugin(modId, modName, "1.3.0")]
     [BepInProcess("Rounds.exe")]
     public class Main : BaseUnityPlugin {
         private const string modId = "com.aalund13.rounds.random_cards_generator";
@@ -40,8 +44,6 @@ namespace RandomCardsGenerators {
 
             assets = Jotunn.Utils.AssetUtils.LoadAssetBundleFromResources("randomcardsgenerator_assets", typeof(Main).Assembly);
             blankCardPrefab = assets.LoadAsset<GameObject>("__RCG__BlankCard");
-
-            Debug.Log($"{modName} loaded!");
         }
 
         void Start() {
@@ -58,7 +60,7 @@ namespace RandomCardsGenerators {
                 DeckCustomizationPatch.Patch(harmony, assembly);
             }
 
-            Debug.Log($"{modName} started!");
+            PickManager.RegisterHandModificationFunction(RandomCardsResolver.ResolveRandomCards, Priority.Low);
         }
     }
 }

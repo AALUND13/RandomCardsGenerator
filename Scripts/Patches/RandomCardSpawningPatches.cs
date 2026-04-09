@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using ModdingUtils.Patches;
 using Photon.Pun;
+using Photon.Realtime;
+using PickPhaseImprovements;
 using RandomCardsGenerators.Cards;
 using RandomCardsGenerators.Utils;
 using System;
@@ -13,36 +15,6 @@ using UnityEngine;
 namespace RandomCardsGenerators.Patches {
     [HarmonyPatch]
     public class RandomCardSpawningPatches {
-        [HarmonyPatch(typeof(CardChoice), "SpawnUniqueCard")]
-        class SpawnUniqueCardPatch {
-            // Mainly used to detect if the card spawning is in the pick phase
-            public static bool PickPhaseCardSpawning = false;
-
-            [HarmonyPriority(Priority.First)] private static void Prefix() => PickPhaseCardSpawning = true;
-            [HarmonyPriority(Priority.First)] private static void Postfix() => PickPhaseCardSpawning = false;
-        }
-
-        [HarmonyPatch(typeof(CardChoice), "Spawn")]
-        [HarmonyPriority(Priority.Last)]
-        [HarmonyPrefix]
-        private static bool Spawn(GameObject objToSpawn, Vector3 pos, Quaternion rot, ref GameObject __result) {
-            if(objToSpawn != null && objToSpawn.GetComponent<RandomCard>() != null) {
-                Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0) 
-                    ? PlayerManager.instance.players[CardChoice.instance.pickrID] 
-                    : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);
-
-                __result = PhotonNetwork.Instantiate(
-                    objToSpawn.name,
-                    pos,
-                    rot,
-                    0,
-                    new object[] { DrawableRandomCard.random.Next(int.MaxValue), new Vector3(1, 1, 1), player.playerID }
-                );
-                return false;
-            }
-            return true;
-        }
-
         [HarmonyPatch(typeof(ModdingUtils.Utils.Cards), "AddCardToPlayer", new Type[] { typeof(Player), typeof(CardInfo), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(bool) })]
         [HarmonyPrefix]
         private static bool AddRandomCardToPlayer(Player player, CardInfo card) {
@@ -60,19 +32,20 @@ namespace RandomCardsGenerators.Patches {
 
         [HarmonyPatch(typeof(ModdingUtils.Utils.Cards), "RPCA_AssignCard", new Type[] { typeof(string), typeof(int), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(bool) })]
         [HarmonyPrefix]
-        public static void AssignRandomCardRPC(string cardObjectName, int playerID, bool reassign, string twoLetterCode, float forceDisplay, float forceDisplayDelay, bool addToCardBar) {
-            FindRandomCardsGeneratorResult findResult = RandomCardsUtils.FindRandomCardsGeneratorByName(cardObjectName);
-            if(findResult != null) {
-                Player playerToUpgrade;
-                playerToUpgrade = PlayerManager.instance.players.Find(p => p.playerID == playerID);
-                findResult.RandomCardsGenerator.GenerateRandomCard(findResult.Seed);
+        public static bool AssignRandomCardRPC(string cardObjectName, int playerID, bool reassign, string twoLetterCode, float forceDisplay, float forceDisplayDelay, bool addToCardBar) {
+            Player playerToUpgrade = PlayerManager.instance.players.Find(p => p.playerID == playerID);
+            if(DrawableRandomCard.ObjectNameToDrawable.TryGetValue(cardObjectName, out var drawableRandomCard)) {
+                if(PhotonNetwork.IsMasterClient || PhotonNetwork.OfflineMode) {
+                    drawableRandomCard.StatCardGenerator.CreateRandomCard(playerToUpgrade);       
+                }
+                return false;
             }
+            return true;
         }
 
         [HarmonyPatch(typeof(CardChoicePatchGetRanomCard), nameof(CardChoicePatchGetRanomCard.OrignialGetRanomCard), new Type[] { typeof(CardInfo[]) })]
         [HarmonyPrefix]
         private static void NormalDrawableCardsSpawn(ref CardInfo[] cards) {
-            if(!SpawnUniqueCardPatch.PickPhaseCardSpawning) return;
             Player player = (((PickerType)CardChoice.instance.GetFieldValue("pickerType") != 0)
                 ? PlayerManager.instance.players[CardChoice.instance.pickrID]
                 : PlayerManager.instance.GetPlayersInTeam(CardChoice.instance.pickrID)[0]);

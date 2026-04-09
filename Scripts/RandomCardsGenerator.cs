@@ -132,10 +132,11 @@ namespace RandomCardsGenerators {
                 try {
                     var seed = (int)data[0];
                     var playerID = (int)data[1];
+                    bool giveToPlayer = data.Length > 2 ? (bool)data[2] : false;
 
                     Player player = PlayerManager.instance.players.Find(p => p.playerID == playerID);
                     CardInfo generatedCard = GenerateRandomCard(player, seed).GetComponent<CardInfo>();
-                    if(player != null) {
+                    if(player != null && giveToPlayer) {
                         Main.instance.ExecuteAfterSeconds(0.2f, () => {
                             ModdingUtils.Utils.Cards.instance.AddCardToPlayer(player, generatedCard, false, RandomCardOption.TwoLetterCode, 2f, 2f, true);
                         });
@@ -147,11 +148,18 @@ namespace RandomCardsGenerators {
         }
 
         public void CreateRandomCard(int seed, Player player = null) {
-            NetworkingManager.RaiseEvent(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID);
+            NetworkingManager.RaiseEvent(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID, true);
         }
         public void CreateRandomCard(Player player = null) {
             int seed = UnityEngine.Random.Range(0, int.MaxValue);
-            NetworkingManager.RaiseEvent(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID);
+            NetworkingManager.RaiseEvent(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID, true);
+        }
+
+        public GameObject CreateRandomCardForOther(Player player = null) {
+            int seed = UnityEngine.Random.Range(0, int.MaxValue);
+            GameObject creatorGenCard = GenerateRandomCard(player, seed);
+            NetworkingManager.RaiseEventOthers(string.Format(SYNC_EVENT_FORMAT, CardGenName), seed, player.playerID, false);
+            return creatorGenCard;
         }
 
         /// <summary>
@@ -175,7 +183,7 @@ namespace RandomCardsGenerators {
             LoggerUtils.LogInfo(debugLog.ToString());
 
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
-            GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
+            GameObject.DestroyImmediate(cardGameObject.transform.GetChild(0).gameObject);
             GameObject.DontDestroyOnLoad(cardGameObject);
 
             var statCard = cardGameObject.GetComponent<CardInfo>();
