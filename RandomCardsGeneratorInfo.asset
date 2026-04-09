@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ModName: RandomCardsGenerator
   Author: AALUND13
-  Version: 1.2.2
+  Version: 1.3.0
   WebsiteURL: https://github.com/AALUND13/RandomCardsGenerator
   Description: 'A library for generating random cards with random stats.   '
   BeforeBuildCommand: 
@@ -24,6 +24,7 @@ MonoBehaviour:
   - Pykess-ModdingUtils-0.4.8
   - Pykess-CardChoiceSpawnUniqueCardPatch-0.1.10
   - Root-RarityLib-1.2.8
+  - Root-PickPhaseImprovements-0.3.1
   DllDependencies: []
   AssemblyDefinitionDependencies: []
   Icon: {fileID: 2800000, guid: 5fc6d1535d90bc24bb6cddc8b2f6e1cd, type: 3}

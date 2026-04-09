@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using ModdingUtils.Patches;
 using Photon.Pun;
+using Photon.Realtime;
 using PickPhaseImprovements;
 using RandomCardsGenerators.Cards;
 using RandomCardsGenerators.Utils;
@@ -31,13 +32,15 @@ namespace RandomCardsGenerators.Patches {
 
         [HarmonyPatch(typeof(ModdingUtils.Utils.Cards), "RPCA_AssignCard", new Type[] { typeof(string), typeof(int), typeof(bool), typeof(string), typeof(float), typeof(float), typeof(bool) })]
         [HarmonyPrefix]
-        public static void AssignRandomCardRPC(string cardObjectName, int playerID, bool reassign, string twoLetterCode, float forceDisplay, float forceDisplayDelay, bool addToCardBar) {
-            FindRandomCardsGeneratorResult findResult = RandomCardsUtils.FindRandomCardsGeneratorByName(cardObjectName);
-            if(findResult != null) {
-                Player playerToUpgrade;
-                playerToUpgrade = PlayerManager.instance.players.Find(p => p.playerID == playerID);
-                findResult.RandomCardsGenerator.GenerateRandomCard(findResult.Seed);
+        public static bool AssignRandomCardRPC(string cardObjectName, int playerID, bool reassign, string twoLetterCode, float forceDisplay, float forceDisplayDelay, bool addToCardBar) {
+            Player playerToUpgrade = PlayerManager.instance.players.Find(p => p.playerID == playerID);
+            if(DrawableRandomCard.ObjectNameToDrawable.TryGetValue(cardObjectName, out var drawableRandomCard)) {
+                if(PhotonNetwork.IsMasterClient || PhotonNetwork.OfflineMode) {
+                    drawableRandomCard.StatCardGenerator.CreateRandomCard(playerToUpgrade);       
+                }
+                return false;
             }
+            return true;
         }
 
         [HarmonyPatch(typeof(CardChoicePatchGetRanomCard), nameof(CardChoicePatchGetRanomCard.OrignialGetRanomCard), new Type[] { typeof(CardInfo[]) })]

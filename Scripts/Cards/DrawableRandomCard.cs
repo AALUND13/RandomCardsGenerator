@@ -16,6 +16,8 @@ namespace RandomCardsGenerators.Cards {
     /// </summary>
     public class DrawableRandomCard {
         internal static List<DrawableRandomCard> DrawableCards = new List<DrawableRandomCard>();
+        internal static Dictionary<string, DrawableRandomCard> ObjectNameToDrawable = new Dictionary<string, DrawableRandomCard>();
+
         internal static readonly System.Random random = new System.Random();
 
         public readonly RandomCardsGenerator StatCardGenerator;
@@ -26,7 +28,7 @@ namespace RandomCardsGenerators.Cards {
             StatCardGenerator = statCardGenerator;
 
             GameObject cardGameObject = GameObject.Instantiate(Main.blankCardPrefab);
-            cardGameObject.name = $"__{statCardGenerator.RandomCardOption.ModInitials}__{statCardGenerator.CardGenName}_DrawableCard";
+            cardGameObject.name = $"{statCardGenerator.CardGenName}_DrawableCard";
 
             GameObject.Destroy(cardGameObject.transform.GetChild(0).gameObject);
             GameObject.DontDestroyOnLoad(cardGameObject);
@@ -46,6 +48,7 @@ namespace RandomCardsGenerators.Cards {
             PhotonNetwork.PrefabPool.RegisterPrefab(cardGameObject.name, cardGameObject);
 
             DrawableCards.Add(this);
+            ObjectNameToDrawable.Add(cardGameObject.name, this);
 
             LoggerUtils.LogInfo($"Created drawable card for '{statCardGenerator.CardGenName}'");
         }

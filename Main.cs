@@ -14,7 +14,9 @@ namespace RandomCardsGenerators {
     [BepInDependency("pykess.rounds.plugins.moddingutils", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("root.rarity.lib", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInPlugin(modId, modName, "1.2.2")]
+    [BepInDependency("Systems.R00t.PickPhaseImprovements")]
+
+    [BepInPlugin(modId, modName, "1.3.0")]
     [BepInProcess("Rounds.exe")]
     public class Main : BaseUnityPlugin {
         private const string modId = "com.aalund13.rounds.random_cards_generator";
@@ -58,7 +60,7 @@ namespace RandomCardsGenerators {
                 DeckCustomizationPatch.Patch(harmony, assembly);
             }
 
-            PickManager.RegisterHandModificationFunction(RandomCardsResolver.ResolveRandomCards, Priority.High);
+            PickManager.RegisterHandModificationFunction(RandomCardsResolver.ResolveRandomCards, Priority.Low);
         }
     }
 }
